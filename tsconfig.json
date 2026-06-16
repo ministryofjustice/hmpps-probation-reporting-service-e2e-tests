@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "types": ["node", "playwright"],
+    "sourceMap": false,
+    "declaration": true,
+    "declarationMap": false,
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": false,
+    "isolatedModules": false,
+    "noUncheckedSideEffectImports": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@tests/*": ["./e2e_tests/tests/*"],
+      "@utils/*": ["./e2e_tests/utils/*"],
+      "@test-data/*": ["./e2e_tests/test-data/*"],
+      "@pages/*": ["./e2e_tests/pages/*"],
+      "@fixtures/*": ["./e2e_tests/fixtures/*"],
+      "@env-config/*": ["./e2e_tests/env-config/*"],
+      "root/*": ["./*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "assets/**/*.js",
+    "coverage",
+    "test_results",
+    "playwright.config.ts",
+    "allure-report/**/*.js"
+  ],
+  "include": ["**/*.ts", "**/*.js"]
+}

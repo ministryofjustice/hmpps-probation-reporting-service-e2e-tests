@@ -1,0 +1,13 @@
+# Placeholder workflow for future scheduled jobs
+# Keeping comments is fine as long as YAML is valid
+
+name: Scheduled Job Placeholder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Placeholder workflow"
