@@ -25,7 +25,8 @@
       "@fixtures/*": ["./e2e_tests/fixtures/*"],
       "@env-config/*": ["./e2e_tests/env-config/*"],
       "root/*": ["./*"]
-    }
+    },
+    "ignoreDeprecations": "6.0",
   },
   "exclude": [
     "node_modules",

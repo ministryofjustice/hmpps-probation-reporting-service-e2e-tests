@@ -1,4 +1,4 @@
 export const apiTestData = {
-  validHearingId: '59cb14a6-e8de-4615-9c9d-260121155732',
-  invalidHearingId: '59cb14a6-e8de-4615',
+  psrUUID: 'fd9fc81d-7be8-4ae1-a41e-f77dd2c39d03',
+  invalidPSRUUID: '59cb14a6-e8de-4615',
 };

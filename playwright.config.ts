@@ -24,6 +24,9 @@ export default defineConfig({
         detail: true,
         outputFolder: 'allure-results',
         suiteTitle: false,
+        environmentInfo: {
+          browser: 'msedge'
+        }
       },
     ],
   ],
@@ -49,18 +52,45 @@ export default defineConfig({
       },
       testMatch: [/.*\.api\.ts$/],
       outputDir: 'allure-results/api',
+      workers: 4, // fast and parallel API tests
     },
+    // {
+    //   name: 'ui-tests',
+    //   testMatch: [/.*\.ui\.ts$/],
+    //   use: { browserName: 'chromium' },
+    //   outputDir: 'allure-results/ui',
+    //   workers: 1, // only ONE browser instance for UI tests to avoid session conflicts and ensure test isolation
+    // },
+    // {
+    //   name: 'e2e-tests',
+    //   testMatch: [/.*\.e2e\.ts$/],
+    //   use: { browserName: 'chromium' },
+    //   outputDir: 'allure-results/e2e',
+    //   workers: 1, // only ONE browser
+    // },
     {
       name: 'ui-tests',
       testMatch: [/.*\.ui\.ts$/],
-      use: { browserName: 'chromium' },
+      use: {
+        channel: 'msedge',
+        launchOptions: {
+          args: ['--disable-features=UseMacAppShim']
+        }
+      },
       outputDir: 'allure-results/ui',
+      workers: 1, // only ONE browser instance for UI tests to avoid session conflicts and ensure test isolation
     },
     {
       name: 'e2e-tests',
       testMatch: [/.*\.e2e\.ts$/],
-      use: { browserName: 'chromium' },
+      use: {
+        channel: 'msedge',
+        launchOptions: {
+          args: ['--disable-features=UseMacAppShim']
+        }
+      },
       outputDir: 'allure-results/e2e',
+      workers: 1, // only ONE browser
     },
   ],
 

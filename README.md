@@ -142,35 +142,40 @@ npm run allure:serve
   All the below scripts are in package.json
 
   To run the tests, use the following command:
-  This test repo supports multiple browsers for running the tests - in case if you would like to run in 'firefox' or 'webkit' please replcae 'chrome' in the below commands and uncomment firefox and webkit in playwright.config.ts. But recommanded to run in 'chrome'.
+  This test repo supports multiple browsers for running the tests(by default it runs on edge browser) - in case if you would like to run in 'firefox' or 'webkit' please replcae 'chrome' in the below commands and uncomment firefox and webkit in playwright.config.ts. But recommanded to run in 'edge'.
   
-  npm run build                     - To build the project(tsconfig.json) - This will compile your .ts files
-                                      into the dist folder as specified in your tsconfig.json.
-
-  npm run test                      - Runs all tests across every Playwright project in headless mode.
+  npm run build                     - To build the project(tsconfig.json) - This will compile
+                                      your .ts files into the dist folder as specified in your tsconfig.json.  
+                                      
+  npm run test                      - Runs all tests across every Playwright project in
+                                      headless mode.  
                                                  
-  npm run test:headed               - Runs all tests across every Playwright project in headed mode, opening the browser 
-                                      for UI/E2E tests while API tests remain headless.
-
+  npm run test:headed               - Runs all tests across every Playwright project in headed
+                                      mode, opening the browser(by default in edge) for UI/E2E tests while API tests remain headless.   
+                                      
   npm run allure:serve              - To view the allure report
 
-  npm run codegen                   - It launches a browser window and starts recording your actions—clicks,
-                                      typing, navigation, etc.—and generates the equivalent Playwright test code in real time.
+  npm run codegen                   - It launches a browser window and starts recording your 
+                                      actions—clicks, typing, navigation, etc.—and generates the equivalent Playwright test code in real time.
 
+ npm run test:smoke:chrome          - Runs all tests across every Playwright project in headed
+                                      mode, opening the chrome browser for UI/E2E tests while API tests remain headless.                            
+                                      
   npm run lint                      - Before committing to catch issues.
 
-  npm run lint:fix                  - During development to tidy up your codebase - Automatically corrects
-                                      fixable issues (e.g., spacing, semicolons, unused imports).  
-
+  npm run lint:fix                  - During development to tidy up your codebase - 
+                                      Automatically corrects fixable issues (e.g., spacing, semicolons, unused imports).
+                                         
   npx playwright 
-  test tests/eg.spec.ts             - Run a Specific Test File, Replace tests/eg.spec.ts with the path to
-                                      your actual test file.
+  test tests/eg.spec.ts             - Run a Specific Test File, Replace tests/eg.spec.ts with
+                                      the path to your actual test file. 
+                                      
+  npm run test:ui                   - UI Mode lets you explore, run, and debug tests with a
+                                      time travel experience complete with a watch mode.       
 
-  npm run test:ui                   - UI Mode lets you explore, run, and debug tests with a time 
-                                      travel experience complete with a watch mode.
-
-  npm run test:debug                - This command opens a browser window as well as the Playwright Inspector. 
-                                      You can use the step over button at the top of the inspector to step through your test.                           
+  npm run test:debug                - This command opens a browser window as well as the
+                                      Playwright Inspector. You can use the step over button at the top of the inspector to step through your test.   
+                                                                   
 
 ### tags:
 
