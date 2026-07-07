@@ -6,9 +6,9 @@ type apiFixtures = {
 };
 
 export const test = base.extend<apiFixtures>({
-  apiClient: async ({}, use) => {
+  apiClient: async ({ }, use) => {
     const api = await request.newContext({
-      baseURL: process.env.DEV_API_BASE_URL!,
+      baseURL: process.env.DEV_PSR_API_BASE_URL!,
       extraHTTPHeaders: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -19,13 +19,13 @@ export const test = base.extend<apiFixtures>({
   },
 
   authToken: async ({ apiClient }, use) => {
-    const response = await apiClient.post(process.env.DEV_API_AUTH_URL!, {
+    const response = await apiClient.post(process.env.DEV_PSR_API_AUTH_URL!, {
       params: { grant_type: 'client_credentials' },
       headers: {
         Accept: 'application/json',
         Authorization:
           'Basic ' +
-          Buffer.from(`${process.env.DEV_API_USERNAME}:${process.env.DEV_API_PASSWORD}`).toString(
+          Buffer.from(`${process.env.DEV_PSR_API_USERNAME}:${process.env.DEV_PSR_API_PASSWORD}`).toString(
             'base64',
           ),
       },
@@ -37,6 +37,7 @@ export const test = base.extend<apiFixtures>({
     ).toBeTruthy();
 
     const body = await response.json();
+    console.log("ACTUAL AUTHENTICATION RESPONSE BODY:", body);
     await use(body.access_token);
   },
 });

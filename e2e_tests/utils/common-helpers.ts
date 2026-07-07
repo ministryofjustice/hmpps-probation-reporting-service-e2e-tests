@@ -4,19 +4,16 @@ export async function clickOnLinkByName(page: Page, linkName: string) {
   await page.getByRole('link', { name: `${linkName}` }).click();
 }
 
-export async function verifyLinkIsVisibleByName(page: Page, linkName: string) {
-  await expect(page.getByRole('link', { name: `${linkName}`, exact: true })).toBeVisible();
+export async function searchBox(page: Page, searchName: string) {
+  await page.getByRole('textbox', { name: 'Enter the CRN or full name of' }).fill(searchName);
 }
 
-export async function selectFromComboBox(page: Page, enterTextOnComboBox: string[]) {
-  const combo = page.locator('input.autocomplete__input');
+export async function verifyPageByText(page: Page, pageTextName: string) {
+  await expect(page.getByText(`${pageTextName}`).first()).toBeVisible();
+}
 
-  for (const nameOfTheCourt of enterTextOnComboBox) {
-    await combo.click();
-    await combo.fill(nameOfTheCourt);
-    await page.getByRole('option', { name: nameOfTheCourt, exact: true }).waitFor();
-    await page.getByRole('option', { name: nameOfTheCourt, exact: true }).click();
-  }
+export async function verifyLinkIsVisibleByName(page: Page, linkName: string) {
+  await expect(page.getByRole('link', { name: `${linkName}`, exact: true })).toBeVisible();
 }
 
 export async function clickOnButtonByName(page: Page, buttonName: string) {
@@ -24,13 +21,14 @@ export async function clickOnButtonByName(page: Page, buttonName: string) {
 }
 
 export async function verifyPageHeadingsByName(page: Page, pageHeadingName: string) {
-  await expect(page.getByRole('heading', { name: `${pageHeadingName}` })).toBeVisible();
+  await expect(page.getByRole('heading', { name: `${pageHeadingName}`, exact: true })).toBeVisible({ timeout: 5000 });
 }
 
 export const commonFunctions = {
   clickOnLinkByName,
+  searchBox,
+  verifyPageByText,
   verifyLinkIsVisibleByName,
   clickOnButtonByName,
   verifyPageHeadingsByName,
-  selectFromComboBox
 };

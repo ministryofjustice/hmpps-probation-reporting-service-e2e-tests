@@ -1,12 +1,12 @@
-import { MyCourtsPage } from '@pages/my-courts-page';
+import { PsrLandingPage } from '@pages/psr-landing-page';
 import { test as base } from '@playwright/test';
 
 type PageFixtures = {
-  myCourtsPage: MyCourtsPage;
+  psrLandingPage: PsrLandingPage;
 };
 
 export const pageFixtures = base.extend<PageFixtures>({
-  myCourtsPage: async ({ page }, use) => {
-    await use(new MyCourtsPage(page));
+  psrLandingPage: async ({ page }, use) => {
+    await use(new PsrLandingPage(page));
   },
 });

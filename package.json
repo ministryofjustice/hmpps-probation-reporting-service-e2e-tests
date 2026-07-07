@@ -9,14 +9,21 @@
     "report": "npx playwright show-report",
     "codegen": "npx playwright codegen",
     "test": "npm run clean:reports && npx playwright test",
+    "test:smoke": "npm run clean:reports && npx playwright test -g smoke",
+    "test:regression": "npm run clean:reports && npx playwright test -g regression",
     "test:headed": "npm run clean:reports && npx playwright test --headed",
-    "test:ui": "npm run clean:reports && npx playwright test --project=ui-tests", 
-    "test:ui:headed": "npm run clean:reports && npx playwright test --project=ui-tests --headed", 
-    "test:api": "npm run clean:reports && npx playwright test --project=api-tests", 
+    "test:ui": "npm run clean:reports && npx playwright test --project=ui-tests",
+    "test:ui:headed": "npm run clean:reports && npx playwright test --project=ui-tests --headed",
+    "test:api": "npm run clean:reports && npx playwright test --project=api-tests",
+    "test:smoke:api": "npm run clean:reports && npx playwright test --project=api-tests",
+    "test:regression:api": "npm run clean:reports && npx playwright test --project=api-tests",
+    "test:smoke:e2e": "npm run clean:reports && npx playwright test --project=e2e-tests",
+    "test:regression:e2e": "npm run clean:reports && npx playwright test --project=e2e-tests",
     "test:e2e": "npm run clean:reports && npx playwright test --project=e2e-tests",
     "test:e2e:headed": "npm run clean:reports && npx playwright test --project=e2e-tests --headed",
-    "test:smoke:chrome": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g smoke",
-    "test:regression:chrome": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g regression",
+    "test:smoke:chrome:ui": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g smoke",
+    "test:regression:chrome:ui": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g regression",
+    "test:ui:grep": "npm run clean:reports && npx playwright test --project=ui-tests --grep @ui",
     "test:debug": "npm run clean:reports && npx playwright test --headed --debug",
     "allure:serve": "allure serve allure-results",
     "build": "tsc",
@@ -39,6 +46,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^25.0.3",
     "allure-playwright": "^3.4.3",
     "eslint": "^9.39.2",
@@ -53,6 +61,6 @@
     "typescript-eslint": "^8.51.0"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.4.2"
   }
 }
