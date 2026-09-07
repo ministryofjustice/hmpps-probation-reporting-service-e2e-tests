@@ -63,11 +63,11 @@ Run these commands to verify setup:
 
 ## Test Types
 
-| Type | Suffix | Description |
-|---|---|---|
-| API | .api.ts | Backend/API-only checks |
-| UI | .ui.ts | Browser UI validation |
-| E2E | .e2e.ts | End-to-end user journeys |
+| Type | Suffix  | Description             |
+|------|---------|-------------------------|
+| API  | .api.ts | Backend/API-only checks |
+| UI   | .ui.ts  | Browser UI validation   |
+| E2E  | .e2e.ts | End-to-end user journeys|
 
 ## Current UI Architecture
 
