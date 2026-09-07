@@ -108,6 +108,7 @@ npm run test:e2e
 ```bash
 npm run test:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
 npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
+npm run test:ui:file:headed -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
 ```
 
 ## UI Textarea Helper

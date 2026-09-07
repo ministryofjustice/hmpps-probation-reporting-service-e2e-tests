@@ -1,4 +1,4 @@
-import { expect, test } from '@fixtures/ui-auth-fixture';
+import { test } from '@fixtures/ui-auth-fixture';
 
 import { commonFunctions } from '@utils/common-helpers';
 

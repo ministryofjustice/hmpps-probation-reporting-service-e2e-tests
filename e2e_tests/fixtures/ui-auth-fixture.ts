@@ -1,7 +1,5 @@
-import { test as base, expect } from '@playwright/test';
-
 import AxeBuilder from '@axe-core/playwright';
-import { commonFunctions } from '@utils/common-helpers';
+import { expect } from '@playwright/test';
 import { pageFixtures } from '@fixtures/page-fixtures';
 
 type AxeFixture = {
@@ -34,78 +32,82 @@ export const test = pageFixtures.extend<AxeFixture>({
     let loginSuccess = false;
     let lastErrorMessage = '';
 
-    while (attempt < maxRetries && !loginSuccess) {
-      attempt++;
+    try {
+      while (attempt < maxRetries && !loginSuccess) {
+        attempt++;
 
-      await page.goto(process.env.DEV_PSR_UI_LOGIN_URL!);
-      await page.fill('#username', process.env.DEV_PSR_UI_USERNAME!);
-      await page.fill('#password', process.env.DEV_PSR_UI_PASSWORD!);
-      await page.getByRole('button', { name: 'Sign in' }).click();
+        await page.goto(process.env.DEV_PSR_UI_LOGIN_URL!);
+        await page.fill('#username', process.env.DEV_PSR_UI_USERNAME!);
+        await page.fill('#password', process.env.DEV_PSR_UI_PASSWORD!);
+        await page.getByRole('button', { name: 'Sign in' }).click();
 
-      const errorSummary = page.locator('#error-summary');
-      const signOut = page.locator('[data-qa="signOut"]');
+        const errorSummary = page.locator('#error-summary');
+        const signOut = page.locator('[data-qa="signOut"]');
 
-      await Promise.race([
-        page
-          .waitForURL(url => !url.pathname.includes('/auth/sign-in'), { timeout: 10000 })
-          .catch(() => { }),
-        errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => { }),
-      ]);
-
-      let hasLoginError = await errorSummary.isVisible().catch(() => false);
-      let stillOnSignInPage = page.url().includes('/auth/sign-in');
-      let hasSignOut = await signOut.isVisible().catch(() => false);
-
-      if (!hasLoginError && !stillOnSignInPage && !hasSignOut) {
         await Promise.race([
-          signOut.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
-          errorSummary.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+          page
+            .waitForURL(url => !url.pathname.includes('/auth/sign-in'), { timeout: 10000 })
+            .catch(() => { }),
+          errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => { }),
         ]);
 
-        hasLoginError = await errorSummary.isVisible().catch(() => false);
-        stillOnSignInPage = page.url().includes('/auth/sign-in');
-        hasSignOut = await signOut.isVisible().catch(() => false);
-      }
+        let hasLoginError = await errorSummary.isVisible().catch(() => false);
+        let stillOnSignInPage = page.url().includes('/auth/sign-in');
+        let hasSignOut = await signOut.isVisible().catch(() => false);
 
-      if (hasLoginError || stillOnSignInPage || !hasSignOut) {
-        lastErrorMessage = hasLoginError
-          ? (await errorSummary.innerText()).trim()
-          : '';
-        if (!lastErrorMessage) {
-          lastErrorMessage = `Login did not reach authenticated page. Current URL: ${page.url()}`;
+        if (!hasLoginError && !stillOnSignInPage && !hasSignOut) {
+          await Promise.race([
+            signOut.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+            errorSummary.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+          ]);
+
+          hasLoginError = await errorSummary.isVisible().catch(() => false);
+          stillOnSignInPage = page.url().includes('/auth/sign-in');
+          hasSignOut = await signOut.isVisible().catch(() => false);
         }
-        console.warn(`Login attempt ${attempt} failed: ${lastErrorMessage}`);
 
-        if (attempt < maxRetries) continue;
-      } else {
-        loginSuccess = true;
-      }
-    }
+        if (hasLoginError || stillOnSignInPage || !hasSignOut) {
+          lastErrorMessage = hasLoginError
+            ? (await errorSummary.innerText()).trim()
+            : '';
+          if (!lastErrorMessage) {
+            lastErrorMessage = `Login did not reach authenticated page. Current URL: ${page.url()}`;
+          }
+          console.warn(`Login attempt ${attempt} failed: ${lastErrorMessage}`);
 
-    if (!loginSuccess) {
-      expect(false, `UI Login failed after ${maxRetries} attempts\n${lastErrorMessage}`).toBe(true);
-    }
-
-    // --- RUN THE TEST ---
-    await use(page);
-
-    // --- LOGOUT + CLEANUP ---
-    try {
-      const signOut = page.locator('[data-qa="signOut"]');
-      if (await signOut.isVisible()) {
-        await signOut.click();
-        if (!page.url().includes('/auth/sign-in')) {
-          console.warn('Logout clicked but no sign-in redirect detected; continuing cleanup');
+          if (attempt < maxRetries) continue;
+        } else {
+          loginSuccess = true;
         }
-      } else {
-        console.warn('Logout skipped: sign out control not visible on current page');
       }
-    } catch (err) {
-      console.warn('Logout skipped:', err);
-    }
 
-    await page.close();
-    await context.close();
+      if (!loginSuccess) {
+        throw new Error(`UI Login failed after ${maxRetries} attempts\n${lastErrorMessage}`);
+      }
+
+      // --- RUN THE TEST ---
+      await use(page);
+    } finally {
+      // --- LOGOUT + CLEANUP ---
+      try {
+        if (loginSuccess) {
+          const signOut = page.locator('[data-qa="signOut"]');
+          if (await signOut.isVisible()) {
+            await signOut.click();
+            if (!page.url().includes('/auth/sign-in')) {
+              console.warn('Logout clicked but no sign-in redirect detected; continuing cleanup');
+            }
+          } else {
+            console.warn('Logout skipped: sign out control not visible on current page');
+          }
+        }
+      } catch (err) {
+        console.warn('Logout skipped:', err);
+      }
+
+      await page.close().catch(err => console.warn('Page close skipped:', err));
+      await context.close().catch(err => console.warn('Context close skipped:', err));
+    }
   }
 });
 
