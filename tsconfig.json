@@ -3,7 +3,11 @@
     "target": "ESNext",
     "module": "commonjs",
     "moduleResolution": "node",
-    "types": ["node", "playwright"],
+    "types": [
+      "node",
+      "playwright",
+      "@axe-core/playwright"
+    ],
     "sourceMap": false,
     "declaration": true,
     "declarationMap": false,
@@ -26,7 +30,7 @@
       "@env-config/*": ["./e2e_tests/env-config/*"],
       "root/*": ["./*"]
     },
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "6.0"
   },
   "exclude": [
     "node_modules",
@@ -39,3 +43,4 @@
   ],
   "include": ["**/*.ts", "**/*.js"]
 }
+
