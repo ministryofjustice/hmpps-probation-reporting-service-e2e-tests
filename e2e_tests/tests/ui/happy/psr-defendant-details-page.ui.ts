@@ -9,7 +9,6 @@ test.describe(`PSR UI journeys – UI behaviour validation`, () => {
     makeAxeBuilder,
   }) => {
     await psrLandingPage.verifyLandingPageAndOpenDefendantDetails();
-    console.log('[Test] Test started, page URL:', page.url());
 
     await commonFunctions.verifyPageHeadingsByName(page, 'Defendant details');
     await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);

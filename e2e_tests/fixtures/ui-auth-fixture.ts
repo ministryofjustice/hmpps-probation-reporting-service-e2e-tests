@@ -52,9 +52,20 @@ export const test = pageFixtures.extend<AxeFixture>({
         errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => { }),
       ]);
 
-      const hasLoginError = await errorSummary.isVisible().catch(() => false);
-      const stillOnSignInPage = page.url().includes('/auth/sign-in');
-      const hasSignOut = await signOut.isVisible().catch(() => false);
+      let hasLoginError = await errorSummary.isVisible().catch(() => false);
+      let stillOnSignInPage = page.url().includes('/auth/sign-in');
+      let hasSignOut = await signOut.isVisible().catch(() => false);
+
+      if (!hasLoginError && !stillOnSignInPage && !hasSignOut) {
+        await Promise.race([
+          signOut.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+          errorSummary.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+        ]);
+
+        hasLoginError = await errorSummary.isVisible().catch(() => false);
+        stillOnSignInPage = page.url().includes('/auth/sign-in');
+        hasSignOut = await signOut.isVisible().catch(() => false);
+      }
 
       if (hasLoginError || stillOnSignInPage || !hasSignOut) {
         lastErrorMessage = hasLoginError

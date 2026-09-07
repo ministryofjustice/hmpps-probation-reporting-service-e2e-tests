@@ -57,7 +57,7 @@ Run these commands to verify setup:
 
 - Run one UI test:
 
-  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-login-and-verify-landing-page.ui.ts
+  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-defendant-details-page.ui.ts
 
 ## Test Types
 

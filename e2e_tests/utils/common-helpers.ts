@@ -58,19 +58,30 @@ export async function verifyPageHeadingsByName(page: Page, pageHeadingName: stri
   await expect(page.getByRole('heading', { name: `${pageHeadingName}`, exact: true })).toBeVisible({ timeout: 5000 });
 }
 
+function getOptionalTestInfo() {
+  try {
+    return test.info();
+  } catch {
+    return undefined;
+  }
+}
+
 export async function verifyNoAccessibilityViolations(makeAxeBuilder: () => AxeBuilder) {
   const results = await makeAxeBuilder().analyze();
   const summary = formatAccessibilitySummary(results);
+  const testInfo = getOptionalTestInfo();
 
-  await test.info().attach('accessibility-summary', {
-    body: Buffer.from(summary, 'utf-8'),
-    contentType: 'text/plain',
-  });
+  if (testInfo) {
+    await testInfo.attach('accessibility-summary', {
+      body: Buffer.from(summary, 'utf-8'),
+      contentType: 'text/plain',
+    });
 
-  await test.info().attach('accessibility-violations', {
-    body: Buffer.from(JSON.stringify(results.violations, null, 2), 'utf-8'),
-    contentType: 'application/json',
-  });
+    await testInfo.attach('accessibility-violations', {
+      body: Buffer.from(JSON.stringify(results.violations, null, 2), 'utf-8'),
+      contentType: 'application/json',
+    });
+  }
 
   expect(results.violations.length, `Accessibility violations detected:\n\n${summary}`).toBe(0);
 }
