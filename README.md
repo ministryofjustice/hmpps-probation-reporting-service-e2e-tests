@@ -1,182 +1,249 @@
 # hmpps-probation-in-court-e2e-tests
 
-This repository contains a structured, scalable end‑to‑end automation framework built using **Playwright (TypeScript)**. It is designed to support three core test types: 
-- **API tests** 
-- **UI tests** 
-- **E2E hybrid tests** (API → UI journeys) 
+This repository contains Playwright (TypeScript) automation for:
 
-Each test type is further separated into **happy** and **unhappy** paths for clarity, reporting accuracy, and long‑term maintainability.
+- API tests
+- UI tests
+- E2E journeys
 
-playwright official website: https://playwright.dev/docs/intro
+Test coverage is organized into happy and unhappy paths for maintainability and reporting clarity.
 
-## Folder Structure
+Playwright docs: https://playwright.dev/docs/intro
 
-e2e-tests/ - actual test specs
-tests/
-api/
-happy/
-unhappy/
-ui/
-happy/
-unhappy/
-e2e/
-happy/
-unhappy/
+## Project Structure
 
-fixtures/ - Contains setup hooks and shared context (e.g. login states, mock servers) used across tests.
-utils/ - Hosts helper functions, custom assertions, and reusable logic to keep tests clean and DRY.
-pages/ - Implements the Page Object Model, encapsulating UI selectors and actions for maintainable test abstraction.
-test-data/ - Stores test data inputs, payloads, and reusable datasets for parameterized scenarios. 
-config/ - – environment configs, secrets references
+```text
+e2e_tests/
+    fixtures/     shared test fixtures (auth, page objects, setup)
+    pages/        page object models
+    test-data/    reusable test data
+    tests/        api/ui/e2e specs
+    utils/        common helpers and generators
+```
 
-### Test Types
-| Type      | Description                                             |
-|-----------|---------------------------------------------------------|
-| **API**   | Backend-only tests using Playwright’s APIRequestContext |
-| **UI**    | Browser-based tests validating frontend behaviour       |
-| **E2E**   | Full journeys combining API setup + UI validation       |
+## Installation and Setup
 
-### Scenario Types
-| Scenario      | Description                         |
-|-------------- |-------------------------------------|
-| **Happy**     | Expected, successful flows          |
-| **Unhappy**   | Negative, error, or edge-case flows |
+### Prerequisites
 
--------------------------------------------------------
+- Node.js (LTS recommended)
+- npm
+- Microsoft Edge (used by current UI and E2E Playwright project configuration)
 
-## Naming Conventions
+### Setup steps
 
-| Test Type | File Suffix |
-|-----------|-------------|
-| API       | `.api.ts`   |
-| UI        | `.ui.ts`    |
-| E2E       | `.e2e.ts`   |
+1. Clone the repository.
+2. Move into the project folder.
+3. Install dependencies:
 
-Example:
-get-user.api.ts
-login.ui.ts
-create-user.e2e.ts
+    npm ci
 
+4. Install Playwright browser dependencies:
 
-## Running Tests
+    npx playwright install
 
-### Run all tests
+5. Create local environment file from template:
 
+    cp .env.example .env
+
+6. Update .env with valid environment values (URLs, usernames, passwords).
+
+### Quick verification
+
+Run these commands to verify setup:
+
+- List UI tests:
+
+  npx playwright test --project=ui-tests --list
+
+- Run one UI test:
+
+  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-login-and-verify-landing-page.ui.ts
+
+## Test Types
+
+| Type | Suffix | Description |
+|---|---|---|
+| API | .api.ts | Backend/API-only checks |
+| UI | .ui.ts | Browser UI validation |
+| E2E | .e2e.ts | End-to-end user journeys |
+
+## Current UI Architecture
+
+- [e2e_tests/fixtures/ui-auth-fixture.ts](e2e_tests/fixtures/ui-auth-fixture.ts) handles login and cleanup only.
+- Page-specific navigation belongs to each UI spec (or its page object methods).
+- This avoids hidden fixture side effects across multiple UI test files.
+
+## Run Commands
+
+### Core commands
+
+```bash
 npx playwright test
-
-### Run only API tests
-
 npx playwright test --project=api-tests
-
-### Run only UI tests
-
 npx playwright test --project=ui-tests
-
-### Run only E2E tests
-
 npx playwright test --project=e2e-tests
+```
 
+### Useful UI commands
 
----
+```bash
+npx playwright test --project=ui-tests --list
+npx playwright test e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts --project=ui-tests --headed
+```
+
+### NPM scripts
+
+```bash
+npm run test
+npm run test:headed
+npm run test:ui
+npm run test:ui:headed
+npm run test:accessibility
+npm run test:api
+npm run test:e2e
+```
+
+### Run one specific file
+
+```bash
+npm run test:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
+npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
+```
+
+## UI Textarea Helper
+
+Shared helper: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
+
+```ts
+fillTextInTextArea(page, textOrLength, textAreaKey?, randomMode?)
+```
+
+- `textOrLength`: direct text (`string`) or character count (`number`)
+- `textAreaKey` (optional): textarea `name/id` or heading text above textarea
+- `randomMode` (optional): `readable` (default) or `complex`
+
+### Examples
+
+```ts
+await commonFunctions.fillTextInTextArea(page, 10000, 'Analyse offences under consideration');
+await commonFunctions.fillTextInTextArea(page, 8000, 'Analyse previous offending behaviour and response to supervision');
+await commonFunctions.fillTextInTextArea(page, 'Manual text from test', 'Analyse offences under consideration');
+await commonFunctions.fillTextInTextArea(page, 5000, 'Analyse offences under consideration', 'complex');
+```
+
+### Notes
+
+- Numeric input defaults to `readable` mode.
+- Use `complex` mode when special characters are required.
+- Max generated length is `20000`.
+- If multiple textareas exist and no key is provided, helper throws a clear error.
+
+## Random Text Generators
+
+Source: [e2e_tests/utils/random-paragraph-generator.ts](e2e_tests/utils/random-paragraph-generator.ts)
+
+- `generateReadableRandomParagraph(length)` for happy-path readable text
+- `generateRandomParagraph(length, { mode: 'complex' })` for stress/edge data
+
+## Other Common Helpers
+
+Source: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
+
+- `verifyNoAccessibilityViolations(makeAxeBuilder)`
+- `verifyPageHeadingsByName(page, headingText)`
+- `verifyPageByText(page, text)`
+- `clickOnButtonByName(page, buttonName)`
+- `selectCheckBoxByName(page, checkBoxName)`
 
 ## Environment Variables
 
-Environment variables are loaded via `.env` and used for:
+Environment variables are loaded from `.env`.
 
-- Base URLs
-- Authentication tokens
-- Credentials
-- Environment-specific configuration
-
-Populate your `.env` file using the values and structure provided in `.env.example`.
-
----
+Use [/.env.example](.env.example) as the template for required keys.
 
 ## Reporting
 
-Allure report is enabled by default:
-
+```bash
 npm run allure:serve
+```
 
----
+Accessibility checks also attach the following artifacts to the Playwright/Allure report:
 
-## Future Enhancements
+- `accessibility-summary`: readable plain-text summary of each violation
+- `accessibility-violations`: raw Axe JSON for developer investigation
 
-- Shared error response validator for unhappy paths  
-- Contract testing layer  
-- CI pipeline matrix for API/UI/E2E separation  
-- Test data builders for dynamic payload generation  
+## Accessibility Standards Used
 
----
+Accessibility checks in this project use Axe tags for these WCAG levels:
+
+### wcag2a
+
+- WCAG 2.0 Level A (minimum requirements)
+- Typical examples: missing alt text, missing form labels, heading structure issues, keyboard access issues
+
+### wcag2aa
+
+- WCAG 2.0 Level AA (enhanced requirements)
+- Typical examples: color contrast, resize text behavior, visible focus, meaningful link text
+
+### wcag21a
+
+- WCAG 2.1 Level A (modern interaction coverage)
+- Typical examples: pointer/gesture behavior, orientation handling, reflow/mobile usability
+
+### wcag21aa
+
+- WCAG 2.1 Level AA (advanced requirements)
+- Typical examples: status messages, stronger contrast expectations, input purpose
+
+## AxeBuilder Configuration
+
+Source: [e2e_tests/fixtures/ui-auth-fixture.ts](e2e_tests/fixtures/ui-auth-fixture.ts)
+
+The shared accessibility fixture creates `makeAxeBuilder()` and applies the default tags:
+
+- `wcag2a`
+- `wcag2aa`
+- `wcag21a`
+- `wcag21aa`
+
+Current shared exclusion:
+
+- `#commonly-reused-element-with-known-issue`
+
+This means every test can call the same builder and run consistent accessibility checks.
+
+### Typical usage in a test
+
+```ts
+await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
+```
+
+### Run accessibility-only tests
+
+```bash
+npm run test:accessibility
+```
+
+### When to add exclusions
+
+- Add exclusions only for known, accepted issues with a clear ticket reference.
+- Keep exclusions as narrow as possible (target the exact selector).
+- Remove exclusions as soon as the underlying issue is fixed.
+
+## Troubleshooting
+
+- If login fails, verify UI credentials and login URL in `.env`.
+- If heading assertions fail, confirm expected heading text/casing.
+- If textarea helper fails with ambiguity, pass `textAreaKey` explicitly.
 
 ## Tech Stack
 
-- **Playwright** (TypeScript)
-- **Node.js**
-- **dotenv**
-- **Page Object Model** (for UI)
-- **API client utilities** (for backend tests)
+- Playwright (TypeScript)
+- Node.js
+- dotenv
+- Page Object Model
 
----
+## Tags
 
-## Getting Started:
-
-### Prerequisites:
-
-    Node.js
-    npm
-    playwright with ts - npm init playwright@latest
-
-### Installation:
-
-    git clone - Clone the repository
-                Navigate to the project directory
-    cd  hmpps-probation-in-court-e2e-tests
-
-### Install the dependencies:
-
-    npm ci  
-
-### Running the Tests:
-
-  All the below scripts are in package.json
-
-  To run the tests, use the following command:
-  This test repo supports multiple browsers for running the tests(by default it runs on edge browser) - in case if you would like to run in 'firefox' or 'webkit' please replcae 'chrome' in the below commands and uncomment firefox and webkit in playwright.config.ts. But recommanded to run in 'edge'.
-  
-  npm run build                     - To build the project(tsconfig.json) - This will compile
-                                      your .ts files into the dist folder as specified in your tsconfig.json.  
-                                      
-  npm run test                      - Runs all tests across every Playwright project in
-                                      headless mode.  
-                                                 
-  npm run test:headed               - Runs all tests across every Playwright project in headed
-                                      mode, opening the browser(by default in edge) for UI/E2E tests while API tests remain headless.   
-                                      
-  npm run allure:serve              - To view the allure report
-
-  npm run codegen                   - It launches a browser window and starts recording your 
-                                      actions—clicks, typing, navigation, etc.—and generates the equivalent Playwright test code in real time.
-
- npm run test:smoke:chrome          - Runs all tests across every Playwright project in headed
-                                      mode, opening the chrome browser for UI/E2E tests while API tests remain headless.                            
-                                      
-  npm run lint                      - Before committing to catch issues.
-
-  npm run lint:fix                  - During development to tidy up your codebase - 
-                                      Automatically corrects fixable issues (e.g., spacing, semicolons, unused imports).
-                                         
-  npx playwright 
-  test tests/eg.spec.ts             - Run a Specific Test File, Replace tests/eg.spec.ts with
-                                      the path to your actual test file. 
-                                      
-  npm run test:ui                   - UI Mode lets you explore, run, and debug tests with a
-                                      time travel experience complete with a watch mode.       
-
-  npm run test:debug                - This command opens a browser window as well as the
-                                      Playwright Inspector. You can use the step over button at the top of the inspector to step through your test.   
-                                                                   
-
-### tags:
-
-Used tags (regression, smoke, e2e, and JIRA ticket reference) -  to organize, filter, and selectively run tests by feature, priority, or environment for scalable automation.
+Tags such as `@smoke`, `@regression`, and ticket references are used for selective test execution and reporting.

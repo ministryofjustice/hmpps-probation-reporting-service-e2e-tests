@@ -50,7 +50,7 @@ export default defineConfig({
       use: {
         headless: true, // force headless so --headed doesn't break API tests
       },
-      testMatch: [/.*\.api\.ts$/],
+      testMatch: [/.*\.(api)\.ts$/],
       outputDir: 'allure-results/api',
       workers: 4, // fast and parallel API tests
     },
@@ -70,7 +70,7 @@ export default defineConfig({
     // },
     {
       name: 'ui-tests',
-      testMatch: [/.*\.ui\.ts$/],
+      testMatch: [/.*\.(ui|spec)\.ts$/],
       use: {
         channel: 'msedge',
         launchOptions: {
@@ -82,7 +82,7 @@ export default defineConfig({
     },
     {
       name: 'e2e-tests',
-      testMatch: [/.*\.e2e\.ts$/],
+      testMatch: [/.*\.(e2e)\.ts$/],
       use: {
         channel: 'msedge',
         launchOptions: {
@@ -140,3 +140,4 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 });
+

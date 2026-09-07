@@ -1,9 +1,17 @@
-import { test } from '@fixtures/ui-auth-fixture';
+import { expect, test } from '@fixtures/ui-auth-fixture';
+
+import { commonFunctions } from '@utils/common-helpers';
 
 test.describe(`PSR UI journeys – UI behaviour validation`, () => {
-  test('User successfully logs in and navigates to the PSR landing page - @smoke @ui @regression', async ({
+  test('Defendant details page functionality and accessibility - @smoke @ui @regression @accessibility', async ({
     page,
+    psrLandingPage,
+    makeAxeBuilder,
   }) => {
+    await psrLandingPage.verifyLandingPageAndOpenDefendantDetails();
     console.log('[Test] Test started, page URL:', page.url());
+
+    await commonFunctions.verifyPageHeadingsByName(page, 'Defendant details');
+    await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
   });
 });
