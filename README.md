@@ -45,7 +45,9 @@ e2e_tests/
 
     cp .env.example .env
 
-6. Update .env with valid environment values (URLs, usernames, passwords).
+6. Update .env with valid environment values (usernames, passwords, and any URL overrides you need).
+
+Note: `DEV_PSR_UI_BASE_URL` is optional. If it is unset or left blank, tests fall back to the default dev UI base URL.
 
 ### Quick verification
 
