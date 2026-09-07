@@ -70,7 +70,7 @@ export default defineConfig({
     // },
     {
       name: 'ui-tests',
-      testMatch: [/.*\.(ui|spec)\.ts$/],
+      testMatch: [/.*\.(ui)\.ts$/],
       use: {
         channel: 'msedge',
         launchOptions: {

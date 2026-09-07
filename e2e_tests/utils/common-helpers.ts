@@ -96,7 +96,7 @@ export async function fillTextInTextArea(
 
   if (textAreaKey) {
     const byNameOrId = page.locator(
-      `textarea[name="${textAreaKey}"], textarea#${textAreaKey}`,
+      `textarea[name="${textAreaKey}"], textarea[id="${textAreaKey}"]`,
     );
 
     if (await byNameOrId.count()) {

@@ -23,8 +23,7 @@ export const test = pageFixtures.extend<AxeFixture>({
   // ---------------------------
   // UI Login + Logout Fixture
   // ---------------------------
-  page: async ({ browser }, use) => {
-    const context = await browser.newContext();
+  page: async ({ context }, use) => {
     const page = await context.newPage();
 
     const maxRetries = 1;
@@ -106,7 +105,6 @@ export const test = pageFixtures.extend<AxeFixture>({
       }
 
       await page.close().catch(err => console.warn('Page close skipped:', err));
-      await context.close().catch(err => console.warn('Context close skipped:', err));
     }
   }
 });
