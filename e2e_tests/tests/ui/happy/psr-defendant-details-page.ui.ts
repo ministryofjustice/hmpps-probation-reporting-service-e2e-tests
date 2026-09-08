@@ -6,7 +6,7 @@ test.describe(`PSR UI journeys – UI behaviour validation`, () => {
     psrLandingPage,
     makeAxeBuilder,
   }) => {
-    await psrLandingPage.verifyLandingPageAndOpenDefendantDetails();
+    await psrLandingPage.verifyLandingPageAndOpenDefendantDetailsPage();
     await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
   });
 });

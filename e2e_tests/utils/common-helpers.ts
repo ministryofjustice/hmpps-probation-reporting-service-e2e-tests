@@ -142,7 +142,12 @@ export async function fillTextInTextArea(
   await textArea.click();
   await expect(textArea).toBeEditable();
 
-  const isContentEditable = (await textArea.getAttribute('contenteditable')) === 'true';
+  const isContentEditable = await textArea.evaluate(element => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    return element.isContentEditable;
+  });
 
   if (isContentEditable) {
     await textArea.press('ControlOrMeta+A');
