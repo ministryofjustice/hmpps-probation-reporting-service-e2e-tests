@@ -11,6 +11,5 @@ export class PsrLandingPage {
     await this.page.goto(defendantDetailsUrl);
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Defendant details');
     await commonFunctions.verifyPageByText(this.page, 'Rebecca PSR Test');
-    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
   }
 }

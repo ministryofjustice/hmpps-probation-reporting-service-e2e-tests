@@ -17,7 +17,7 @@ e2e_tests/
     fixtures/     shared test fixtures (auth, page objects, setup)
     pages/        page object models
     test-data/    reusable test data
-  tests/        api/ui/e2e test suites
+    tests/        api/ui/e2e test suites
     utils/        common helpers and generators
 ```
 
