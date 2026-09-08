@@ -17,7 +17,7 @@ e2e_tests/
     fixtures/     shared test fixtures (auth, page objects, setup)
     pages/        page object models
     test-data/    reusable test data
-    tests/        api/ui/e2e specs
+  tests/        api/ui/e2e test suites
     utils/        common helpers and generators
 ```
 
@@ -67,7 +67,9 @@ Run these commands to verify setup:
 |------|---------|-------------------------|
 | API  | .api.ts | Backend/API-only checks |
 | UI   | .ui.ts  | Browser UI validation   |
-| E2E  | .e2e.ts | End-to-end user journeys|
+| E2E  | .e2e.ts | End-to-end user journeys (when implemented) |
+
+Current status: API and UI automated specs are present. The E2E folder currently contains placeholder files.
 
 ## Current UI Architecture
 

@@ -9,6 +9,8 @@ export class PsrLandingPage {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Pre-sentence Service');
     const defendantDetailsUrl = `${uiTestData.uiBaseUrl}/psr/${uiTestData.psrUUID}/defendant-details`;
     await this.page.goto(defendantDetailsUrl);
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Defendant details');
     await commonFunctions.verifyPageByText(this.page, 'Rebecca PSR Test');
+    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
   }
 }

@@ -92,11 +92,11 @@ export async function fillTextInTextArea(
   textAreaKey?: string,
   randomMode: RandomParagraphMode = 'readable',
 ) {
-  let textArea = page.locator('textarea');
+  let textArea = page.locator('textarea:visible, [contenteditable="true"][role="textbox"]:visible');
 
   if (textAreaKey) {
     const byNameOrId = page.locator(
-      `textarea[name="${textAreaKey}"], textarea[id="${textAreaKey}"]`,
+      `textarea[name="${textAreaKey}"]:visible, textarea[id="${textAreaKey}"]:visible, [contenteditable="true"][role="textbox"][aria-label="${textAreaKey}"]:visible, [contenteditable="true"][role="textbox"][id="${textAreaKey}"]:visible, [contenteditable="true"][role="textbox"][name="${textAreaKey}"]:visible`,
     );
 
     if (await byNameOrId.count()) {
@@ -109,11 +109,15 @@ export async function fillTextInTextArea(
 
       await expect(heading).toBeVisible();
 
-      const inFormGroup = heading.locator('xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//textarea').first();
+      const inFormGroup = heading.locator(
+        'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or (@contenteditable="true" and @role="textbox")][not(@hidden)]',
+      ).first();
       if (await inFormGroup.count()) {
         textArea = inFormGroup;
       } else {
-        textArea = heading.locator('xpath=following::textarea[1]').first();
+        textArea = heading.locator(
+          'xpath=following::*[self::textarea or (@contenteditable="true" and @role="textbox")][not(@hidden)][1]',
+        ).first();
       }
     }
   }
@@ -137,7 +141,18 @@ export async function fillTextInTextArea(
 
   await textArea.click();
   await expect(textArea).toBeEditable();
-  await textArea.clear();
+
+  const isContentEditable = (await textArea.getAttribute('contenteditable')) === 'true';
+
+  if (isContentEditable) {
+    await page.keyboard.press('Meta+A');
+    await page.keyboard.press('Backspace');
+    await expect(textArea).toHaveText('');
+  } else {
+    await textArea.clear();
+    await expect(textArea).toHaveValue('');
+  }
+
   await textArea.fill(textToFill);
 
   return textToFill;
