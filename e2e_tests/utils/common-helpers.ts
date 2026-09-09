@@ -92,11 +92,11 @@ export async function fillTextInTextArea(
   textAreaKey?: string,
   randomMode: RandomParagraphMode = 'readable',
 ) {
-  let textArea = page.locator('textarea');
+  let textArea = page.locator('textarea:visible, [contenteditable]:visible');
 
   if (textAreaKey) {
     const byNameOrId = page.locator(
-      `textarea[name="${textAreaKey}"], textarea[id="${textAreaKey}"]`,
+      `textarea[name="${textAreaKey}"]:visible, textarea[id="${textAreaKey}"]:visible, [contenteditable][aria-label="${textAreaKey}"]:visible, [contenteditable][id="${textAreaKey}"]:visible, [contenteditable][name="${textAreaKey}"]:visible`,
     );
 
     if (await byNameOrId.count()) {
@@ -109,11 +109,15 @@ export async function fillTextInTextArea(
 
       await expect(heading).toBeVisible();
 
-      const inFormGroup = heading.locator('xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//textarea').first();
+      const inFormGroup = heading.locator(
+        'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
+      ).first();
       if (await inFormGroup.count()) {
         textArea = inFormGroup;
       } else {
-        textArea = heading.locator('xpath=following::textarea[1]').first();
+        textArea = heading.locator(
+          'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+        ).first();
       }
     }
   }
@@ -137,7 +141,23 @@ export async function fillTextInTextArea(
 
   await textArea.click();
   await expect(textArea).toBeEditable();
-  await textArea.clear();
+
+  const isContentEditable = await textArea.evaluate(element => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    return element.isContentEditable;
+  });
+
+  if (isContentEditable) {
+    await textArea.press('ControlOrMeta+A');
+    await textArea.press('Backspace');
+    await expect(textArea).toHaveText('');
+  } else {
+    await textArea.clear();
+    await expect(textArea).toHaveValue('');
+  }
+
   await textArea.fill(textToFill);
 
   return textToFill;
