@@ -3,10 +3,12 @@ import { test } from '@fixtures/ui-auth-fixture';
 
 test.describe(`PSR UI journeys – UI behaviour validation`, () => {
   test('Defendant details page functionality and accessibility - @smoke @ui @regression @accessibility', async ({
-    psrLandingPage,
+    psrStartPage,
+    psrDefendantDetailsPage,
     makeAxeBuilder,
   }) => {
-    await psrLandingPage.verifyLandingPageAndOpenDefendantDetailsPage();
+    await psrStartPage.openDefendantDetailsPage();
+    await psrDefendantDetailsPage.verifyDefendantDetailsPage();
     await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
   });
 });
