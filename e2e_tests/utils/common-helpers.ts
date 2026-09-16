@@ -1,5 +1,9 @@
 import { Page, expect, test } from '@playwright/test';
-import { RandomParagraphMode, generateRandomParagraph, generateReadableRandomParagraph } from '@utils/random-paragraph-generator';
+import {
+  RandomParagraphMode,
+  generateRandomParagraph,
+  generateReadableRandomParagraph,
+} from '@utils/random-paragraph-generator';
 
 import AxeBuilder from '@axe-core/playwright';
 
@@ -55,7 +59,9 @@ export async function clickOnButtonByName(page: Page, buttonName: string) {
 }
 
 export async function verifyPageHeadingsByName(page: Page, pageHeadingName: string) {
-  await expect(page.getByRole('heading', { name: `${pageHeadingName}`, exact: true })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole('heading', { name: `${pageHeadingName}`, exact: true })).toBeVisible({
+    timeout: 5000,
+  });
 }
 
 function getOptionalTestInfo() {
@@ -102,47 +108,78 @@ export async function fillTextInTextArea(
     if (await byNameOrId.count()) {
       textArea = byNameOrId.first();
     } else {
-      const heading = page.getByRole('heading', {
-        name: textAreaKey,
-        exact: true,
-      }).first();
+      const byAccessibleName = page
+        .getByRole('textbox', { name: textAreaKey, exact: true })
+        .first();
 
-      await expect(heading).toBeVisible();
-
-      const inFormGroup = heading.locator(
-        'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
-      ).first();
-      if (await inFormGroup.count()) {
-        textArea = inFormGroup;
+      if (await byAccessibleName.count()) {
+        textArea = byAccessibleName;
       } else {
-        textArea = heading.locator(
-          'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-        ).first();
+        const heading = page
+          .getByRole('heading', {
+            name: textAreaKey,
+            exact: true,
+          })
+          .first();
+
+        const fieldLabel = (await heading.count())
+          ? heading
+          : page.getByText(textAreaKey, { exact: true }).first();
+
+        const availableTextAreas = page.locator('textarea:visible, [contenteditable]:visible');
+        if (!(await fieldLabel.count()) && (await availableTextAreas.count()) === 1) {
+          textArea = availableTextAreas.first();
+        } else {
+          await expect(fieldLabel).toBeVisible();
+
+          const inFormGroup = fieldLabel
+            .locator(
+              'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
+            )
+            .first();
+          if (await inFormGroup.count()) {
+            textArea = inFormGroup;
+          } else {
+            const inNearestContainer = fieldLabel.locator(
+              'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
+            );
+            textArea = (await inNearestContainer.count())
+              ? inNearestContainer.first()
+              : fieldLabel
+                  .locator(
+                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                  )
+                  .first();
+          }
+        }
       }
     }
   }
 
   const matches = await textArea.count();
   if (matches === 0) {
-    throw new Error('No textarea found. Pass textarea name/id or heading text.');
+    throw new Error('No textarea found. Pass textarea name/id, label, or heading text.');
   }
 
   if (!textAreaKey && matches > 1) {
-    throw new Error('Multiple textareas found. Pass textarea name/id or heading text to disambiguate.');
+    throw new Error(
+      'Multiple textareas found. Pass textarea name/id, label, or heading text to disambiguate.',
+    );
   }
 
   textArea = textArea.first();
 
-  const textToFill = typeof textOrLength === 'number'
-    ? randomMode === 'readable'
-      ? generateReadableRandomParagraph(textOrLength)
-      : generateRandomParagraph(textOrLength)
-    : textOrLength;
+  const textToFill =
+    typeof textOrLength === 'number'
+      ? randomMode === 'readable'
+        ? generateReadableRandomParagraph(textOrLength)
+        : generateRandomParagraph(textOrLength)
+      : textOrLength;
 
   await textArea.click();
   await expect(textArea).toBeEditable();
 
-  const isContentEditable = await textArea.evaluate(element => {
+  const isContentEditable = await textArea.evaluate((element) => {
     if (!(element instanceof HTMLElement)) {
       return false;
     }
@@ -169,6 +206,37 @@ export async function selectCheckBoxByName(page: Page, checkBoxName: string) {
   expect(isChecked).toBeTruthy();
 }
 
+export async function selectRadioButtonByName(page: Page, radioName: string) {
+  const radio = page.getByRole('radio', { name: radioName, exact: true });
+  await radio.check();
+  await expect(radio).toBeChecked();
+}
+
+export async function selectDropdownOption(page: Page, dropdownName: string, optionLabel: string) {
+  const dropdownByIdOrName = page
+    .locator(`select[name="${dropdownName}"], select[id="${dropdownName}"]`)
+    .first();
+
+  const dropdown = (await dropdownByIdOrName.count())
+    ? dropdownByIdOrName
+    : page.getByRole('combobox', { name: dropdownName, exact: true }).first();
+
+  await expect(dropdown).toBeVisible();
+  await dropdown.selectOption({ label: optionLabel });
+  await expect(dropdown.locator('option:checked')).toHaveText(optionLabel);
+}
+
+export async function selectDropdownOptions(
+  page: Page,
+  dropdownName: string,
+  optionValues: string[],
+) {
+  // Select and verify every supplied option; the final option remains selected.
+  for (const optionValue of optionValues) {
+    await selectDropdownOption(page, dropdownName, optionValue);
+  }
+}
+
 export const commonFunctions = {
   clickOnLinkByName,
   searchBox,
@@ -181,4 +249,7 @@ export const commonFunctions = {
   generateReadableRandomParagraph,
   fillTextInTextArea,
   selectCheckBoxByName,
+  selectRadioButtonByName,
+  selectDropdownOption,
+  selectDropdownOptions,
 };
