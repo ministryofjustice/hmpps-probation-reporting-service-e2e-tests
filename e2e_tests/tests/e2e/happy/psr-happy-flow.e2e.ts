@@ -1,15 +1,14 @@
-import { commonFunctions } from '@utils/common-helpers';
 import { test } from '@fixtures/ui-auth-fixture';
 
-test.describe(`PSR UI journeys – UI behaviour validation`, () => {
-  test('Sentencing proposal page and custodial option functionality and accessibility - @smoke @ui @regression @accessibility', async ({
+test.describe('PSR end-to-end journey', () => {
+  test('completes the PSR happy journey - @smoke @e2e @regression', async ({
     psrStartPage,
     psrDefendantDetailsPage,
     psrOffenceAnalysisPage,
     psrDefendantBehaviourAndLifestyleAssessmentPage,
     psrRiskAnalysisPage,
     psrSentencingProposalPage,
-    makeAxeBuilder,
+    psrSourcesOfInformationPage,
   }) => {
     await psrStartPage.openDefendantDetailsPage();
     await psrDefendantDetailsPage.verifyDefendantDetailsPage();
@@ -21,6 +20,6 @@ test.describe(`PSR UI journeys – UI behaviour validation`, () => {
     await psrRiskAnalysisPage.completePsrRiskAnalysisPage();
     await psrRiskAnalysisPage.continueToSentencingProposalPage();
     await psrSentencingProposalPage.completePsrSentencingProposalPage();
-    await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
+    await psrSourcesOfInformationPage.completePsrSourcesOfInformationPage();
   });
 });

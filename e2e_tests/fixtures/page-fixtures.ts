@@ -3,6 +3,7 @@ import { PsrDefendantDetailsPage } from '@pages/psr-defendant-details-page';
 import { PsrOffenceAnalysisPage } from '@pages/psr-offence-analysis-page';
 import { PsrRiskAnalysisPage } from '@pages/psr-risk-analysis-page';
 import { PsrSentencingProposalPage } from '@pages/psr-sentencing-proposal-page';
+import { PsrSourcesOfInformationPage } from '@pages/psr-sources-of-information-page';
 import { PsrStartPage } from '@pages/psr-start-page';
 import { test as base } from '@playwright/test';
 
@@ -13,6 +14,7 @@ type PageFixtures = {
   psrDefendantBehaviourAndLifestyleAssessmentPage: PsrDefendantBehaviourAndLifestyleAssessmentPage;
   psrRiskAnalysisPage: PsrRiskAnalysisPage;
   psrSentencingProposalPage: PsrSentencingProposalPage;
+  psrSourcesOfInformationPage: PsrSourcesOfInformationPage;
 };
 
 export const pageFixtures = base.extend<PageFixtures>({
@@ -33,5 +35,8 @@ export const pageFixtures = base.extend<PageFixtures>({
   },
   psrSentencingProposalPage: async ({ page }, use) => {
     await use(new PsrSentencingProposalPage(page));
+  },
+  psrSourcesOfInformationPage: async ({ page }, use) => {
+    await use(new PsrSourcesOfInformationPage(page));
   },
 });

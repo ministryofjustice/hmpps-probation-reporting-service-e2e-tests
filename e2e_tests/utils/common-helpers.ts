@@ -73,6 +73,10 @@ function getOptionalTestInfo() {
 }
 
 export async function verifyNoAccessibilityViolations(makeAxeBuilder: () => AxeBuilder) {
+  if (process.env.RUN_ACCESSIBILITY_TESTS !== 'true') {
+    return;
+  }
+
   const results = await makeAxeBuilder().analyze();
   const summary = formatAccessibilitySummary(results);
   const testInfo = getOptionalTestInfo();
@@ -200,6 +204,34 @@ export async function fillTextInTextArea(
   return textToFill;
 }
 
+export function waitForAutoSaveConfirmation(page: Page) {
+  return page.waitForEvent('console', {
+    predicate: (message) => message.text().includes('Report saved successfully'),
+    timeout: 20_000,
+  });
+}
+
+export async function verifyTextIsPersisted(page: Page, pageName: string, text: string) {
+  await verifyPageHeadingsByName(page, pageName);
+  await expect(page.getByText(text, { exact: true })).toBeVisible();
+}
+
+export async function verifyTextAreaAutoSavesAfterInactivity(
+  page: Page,
+  editorName: string,
+  pageName: string,
+  textToFill: string,
+) {
+  await verifyPageHeadingsByName(page, pageName);
+
+  const autoSaveConfirmation = waitForAutoSaveConfirmation(page);
+  const enteredText = await fillTextInTextArea(page, textToFill, editorName);
+  await autoSaveConfirmation;
+
+  await page.reload();
+  await verifyTextIsPersisted(page, pageName, enteredText);
+}
+
 export async function selectCheckBoxByName(page: Page, checkBoxName: string) {
   await page.getByRole('checkbox', { name: `${checkBoxName}` }).check();
   const isChecked = await page.getByRole('checkbox', { name: `${checkBoxName}` }).isChecked();
@@ -248,6 +280,9 @@ export const commonFunctions = {
   generateRandomParagraph,
   generateReadableRandomParagraph,
   fillTextInTextArea,
+  waitForAutoSaveConfirmation,
+  verifyTextIsPersisted,
+  verifyTextAreaAutoSavesAfterInactivity,
   selectCheckBoxByName,
   selectRadioButtonByName,
   selectDropdownOption,

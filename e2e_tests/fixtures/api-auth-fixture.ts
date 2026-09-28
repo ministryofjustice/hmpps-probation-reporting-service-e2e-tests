@@ -25,9 +25,9 @@ export const test = base.extend<apiFixtures>({
         Accept: 'application/json',
         Authorization:
           'Basic ' +
-          Buffer.from(`${process.env.DEV_PSR_API_USERNAME}:${process.env.DEV_PSR_API_PASSWORD}`).toString(
-            'base64',
-          ),
+          Buffer.from(
+            `${process.env.DEV_PSR_API_USERNAME}:${process.env.DEV_PSR_API_PASSWORD}`,
+          ).toString('base64'),
       },
     });
 
@@ -37,7 +37,12 @@ export const test = base.extend<apiFixtures>({
     ).toBeTruthy();
 
     const body = await response.json();
-    console.log("ACTUAL AUTHENTICATION RESPONSE BODY:", body);
+    console.log('API authentication succeeded:', {
+      status: response.status(),
+      expiresIn: body.expires_in,
+      tokenType: body.token_type,
+      scope: body.scope,
+    });
     await use(body.access_token);
   },
 });

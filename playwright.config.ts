@@ -25,8 +25,8 @@ export default defineConfig({
         outputFolder: 'allure-results',
         suiteTitle: false,
         environmentInfo: {
-          browser: 'msedge'
-        }
+          browser: 'msedge',
+        },
       },
     ],
   ],
@@ -74,8 +74,8 @@ export default defineConfig({
       use: {
         channel: 'msedge',
         launchOptions: {
-          args: ['--disable-features=UseMacAppShim']
-        }
+          args: ['--disable-features=UseMacAppShim'],
+        },
       },
       outputDir: 'allure-results/ui',
       workers: 1, // only ONE browser instance for UI tests to avoid session conflicts and ensure test isolation
@@ -86,8 +86,8 @@ export default defineConfig({
       use: {
         channel: 'msedge',
         launchOptions: {
-          args: ['--disable-features=UseMacAppShim']
-        }
+          args: ['--disable-features=UseMacAppShim'],
+        },
       },
       outputDir: 'allure-results/e2e',
       workers: 1, // only ONE browser
@@ -140,4 +140,3 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 });
-

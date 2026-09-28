@@ -35,15 +35,15 @@ e2e_tests/
 2. Move into the project folder.
 3. Install dependencies:
 
-    npm ci
+   npm ci
 
 4. Install Playwright browser dependencies:
 
-    npx playwright install
+   npx playwright install
 
 5. Create local environment file from template:
 
-    cp .env.example .env
+   cp .env.example .env
 
 6. Update .env with valid environment values (usernames, passwords, and any URL overrides you need).
 
@@ -59,23 +59,37 @@ Run these commands to verify setup:
 
 - Run one UI test:
 
-  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-defendant-details-page.ui.ts
+  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-defendant-details-page-happy.ui.ts
 
 ## Test Types
 
-| Type | Suffix  | Description             |
-|------|---------|-------------------------|
-| API  | .api.ts | Backend/API-only checks |
-| UI   | .ui.ts  | Browser UI validation   |
-| E2E  | .e2e.ts | End-to-end user journeys (when implemented) |
+| Type | Suffix  | Description                                |
+| ---- | ------- | ------------------------------------------ |
+| API  | .api.ts | Backend/API-only checks                    |
+| UI   | .ui.ts  | Browser UI validation                      |
+| E2E  | .e2e.ts | Complete browser journeys across PSR pages |
 
-Current status: API and UI automated specs are present. The E2E folder currently contains placeholder files.
+Current coverage includes API checks, direct-route UI page tests, an offence-analysis autosave suite, Sources of information tests, and an E2E journey from Sentencing proposal to Sources of information.
 
-## Current UI Architecture
+## Test Architecture
 
 - [e2e_tests/fixtures/ui-auth-fixture.ts](e2e_tests/fixtures/ui-auth-fixture.ts) handles login and cleanup only.
-- Page-specific navigation belongs to each UI spec (or its page object methods).
-- This avoids hidden fixture side effects across multiple UI test files.
+- [e2e_tests/fixtures/page-fixtures.ts](e2e_tests/fixtures/page-fixtures.ts) supplies page objects for each PSR page.
+- Page-level UI suites open their authenticated page route directly. This keeps page behavior tests independent and fast.
+- UI happy-path and unhappy-path scenarios are kept in separate `tests/ui/happy` and `tests/ui/unhappy` suites.
+- The offence-analysis autosave suite is intentionally journey-based because it verifies save triggers across navigation, Save and continue, inactivity, and sign-out.
+- E2E specs own cross-page navigation and do not run Axe accessibility scans. Accessibility scans run in the relevant UI suites.
+
+### Current PSR Page Coverage
+
+- Defendant details
+- Offence analysis
+- Defendant behaviour and lifestyle assessment
+- Risk analysis
+- Sentencing proposal, including the conditional custodial-sentence field
+- Sources of information, including predefined selections, custom source add/remove, validation, persistence, and character-limit behavior
+- Offence analysis autosave triggers
+- E2E journey through Sentencing proposal to Sources of information
 
 ## Run Commands
 
@@ -92,7 +106,25 @@ npx playwright test --project=e2e-tests
 
 ```bash
 npx playwright test --project=ui-tests --list
-npx playwright test e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts --project=ui-tests --headed
+npx playwright test e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts --project=ui-tests --headed
+npx playwright test e2e_tests/tests/ui/unhappy/psr-sources-of-information-page-unhappy.ui.ts --project=ui-tests
+npx playwright test e2e_tests/tests/e2e/happy/psr-happy-journey.e2e.ts --project=e2e-tests
+```
+
+Run all UI happy or unhappy-path tests:
+
+```bash
+npx playwright test e2e_tests/tests/ui/happy --project=ui-tests
+npx playwright test e2e_tests/tests/ui/unhappy --project=ui-tests
+```
+
+### Run by tag
+
+```bash
+npx playwright test --project=ui-tests --grep @autosave
+npx playwright test --project=ui-tests --grep @sources-information
+npx playwright test --project=ui-tests --grep @offence-analysis
+npx playwright test --project=e2e-tests --grep @e2e
 ```
 
 ### NPM scripts
@@ -110,9 +142,9 @@ npm run test:e2e
 ### Run one specific file
 
 ```bash
-npm run test:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
-npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
-npm run test:ui:file:headed -- e2e_tests/tests/ui/happy/psr-offence-analysis-page.ui.ts
+npm run test:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
+npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
+npm run test:ui:file:headed -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
 ```
 
 ## UI Textarea Helper
@@ -131,9 +163,22 @@ fillTextInTextArea(page, textOrLength, textAreaKey?, randomMode?)
 
 ```ts
 await commonFunctions.fillTextInTextArea(page, 10000, 'Analyse offences under consideration');
-await commonFunctions.fillTextInTextArea(page, 8000, 'Analyse previous offending behaviour and response to supervision');
-await commonFunctions.fillTextInTextArea(page, 'Manual text from test', 'Analyse offences under consideration');
-await commonFunctions.fillTextInTextArea(page, 5000, 'Analyse offences under consideration', 'complex');
+await commonFunctions.fillTextInTextArea(
+  page,
+  8000,
+  'Analyse previous offending behaviour and response to supervision',
+);
+await commonFunctions.fillTextInTextArea(
+  page,
+  'Manual text from test',
+  'Analyse offences under consideration',
+);
+await commonFunctions.fillTextInTextArea(
+  page,
+  5000,
+  'Analyse offences under consideration',
+  'complex',
+);
 ```
 
 ### Notes
@@ -159,6 +204,8 @@ Source: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
 - `verifyPageByText(page, text)`
 - `clickOnButtonByName(page, buttonName)`
 - `selectCheckBoxByName(page, checkBoxName)`
+- `waitForAutoSaveConfirmation(page)`
+- `verifyTextAreaAutoSavesAfterInactivity(page, editorName, pageName, text)`
 
 ## Environment Variables
 
@@ -176,6 +223,12 @@ Accessibility checks also attach the following artifacts to the Playwright/Allur
 
 - `accessibility-summary`: readable plain-text summary of each violation
 - `accessibility-violations`: raw Axe JSON for developer investigation
+
+Accessibility scanning is disabled in normal UI and full-suite runs while the known application issues are outstanding. The Axe implementation and `@accessibility` tags remain in place; enable the checks explicitly with:
+
+```bash
+npm run test:accessibility
+```
 
 ## Accessibility Standards Used
 
@@ -251,4 +304,9 @@ npm run test:accessibility
 
 ## Tags
 
-Tags such as `@smoke`, `@regression`, and ticket references are used for selective test execution and reporting.
+Use tags for selective test execution and reporting:
+
+- Test scope: `@api`, `@ui`, `@e2e`, `@accessibility`
+- Test level: `@smoke`, `@regression`
+- Page coverage: `@defendant-details`, `@offence-analysis`, `@defendant-behaviour`, `@risk-analysis`, `@sentencing-proposal`, `@sources-information`
+- Autosave: `@autosave`, `@autosave-side-navigation`, `@autosave-save-and-continue`, `@autosave-inactivity`, `@autosave-sign-out`

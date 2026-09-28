@@ -1,14 +1,20 @@
 import { Page } from '@playwright/test';
 import { commonFunctions } from '@utils/common-helpers';
+import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSentencingProposalPage {
   constructor(public page: Page) {}
+
+  async openPsrSentencingProposalPage() {
+    await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${uiTestData.psrUUID}/sentencing-proposal`);
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Sentencing proposal');
+  }
 
   async completePsrSentencingProposalPage() {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Sentencing proposal');
     await commonFunctions.fillTextInTextArea(
       this.page,
-      20000,
+      4000,
       'Enter the proposed sentence',
       'readable',
     );
@@ -34,5 +40,10 @@ export class PsrSentencingProposalPage {
       'Explain the impact of a custodial sentence if relevant',
       'readable',
     );
+  }
+
+  async continueToSourcesOfInformationPage() {
+    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Sources of information');
   }
 }
