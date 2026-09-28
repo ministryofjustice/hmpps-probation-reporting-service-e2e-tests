@@ -54,12 +54,10 @@ export async function signIn(page: Page) {
 export async function signOut(page: Page) {
   const signOutControl = page.locator('[data-qa="signOut"]');
   await signOutControl.click({ noWaitAfter: true });
-  await page
-    .waitForURL((url) => url.pathname.includes('/auth/sign-in'), {
-      timeout: 5_000,
-      waitUntil: 'domcontentloaded',
-    })
-    .catch(() => { });
+  await page.waitForURL((url) => url.pathname.includes('/auth/sign-in'), {
+    timeout: 5_000,
+    waitUntil: 'domcontentloaded',
+  });
 }
 
 // Merge pageFixtures + Axe accessibility fixture
