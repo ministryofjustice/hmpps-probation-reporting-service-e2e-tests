@@ -4,7 +4,7 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSourcesOfInformationPage {
-  constructor(public page: Page) { }
+  constructor(public page: Page) {}
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
