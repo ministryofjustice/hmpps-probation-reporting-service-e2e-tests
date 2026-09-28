@@ -21,6 +21,9 @@ test.describe('Sources of information page - unhappy paths', () => {
   test('requires at least one source - @ui @regression @sources-information', async ({
     psrSourcesOfInformationPage,
   }) => {
+    await psrSourcesOfInformationPage.clearManuallyAddedSources();
+    await psrSourcesOfInformationPage.saveAndContinue();
+    await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
     await psrSourcesOfInformationPage.clearPredefinedSourceSelections();
     await psrSourcesOfInformationPage.saveAndContinue();
     await psrSourcesOfInformationPage.verifyValidationError(

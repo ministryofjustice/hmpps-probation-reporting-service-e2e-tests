@@ -4,7 +4,7 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSourcesOfInformationPage {
-  constructor(public page: Page) {}
+  constructor(public page: Page) { }
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
@@ -43,6 +43,16 @@ export class PsrSourcesOfInformationPage {
     await expect(this.sourceRow(source)).not.toBeVisible();
   }
 
+  async clearManuallyAddedSources() {
+    const removeButtons = this.page.locator(
+      '#added-sources .added-source button[name="removeSource"]',
+    );
+
+    while ((await removeButtons.count()) > 0) {
+      await removeButtons.first().click();
+    }
+  }
+
   async verifyPageControls() {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Sources of information');
     await expect(this.page.getByRole('checkbox').first()).toBeVisible();
@@ -52,10 +62,20 @@ export class PsrSourcesOfInformationPage {
   }
 
   async verifyPredefinedSourcesCanBeSelectedIndependently(sources: string[]) {
-    for (const source of sources) {
-      const checkbox = this.page.getByRole('checkbox', { name: source, exact: true });
+    const checkboxes = sources.map((source) =>
+      this.page.getByRole('checkbox', { name: source, exact: true }),
+    );
+
+    for (const checkbox of checkboxes) {
       await expect(checkbox).toBeVisible();
       await expect(checkbox).toBeEnabled();
+      await checkbox.check();
+    }
+
+    for (const checkbox of checkboxes) {
+      await expect(checkbox).toBeChecked();
+      await checkbox.uncheck();
+      await expect(checkbox).not.toBeChecked();
     }
   }
 
