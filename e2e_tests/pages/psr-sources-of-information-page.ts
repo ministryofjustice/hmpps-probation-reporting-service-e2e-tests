@@ -4,7 +4,7 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSourcesOfInformationPage {
-  constructor(public page: Page) {}
+  constructor(public page: Page) { }
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
@@ -67,10 +67,9 @@ export class PsrSourcesOfInformationPage {
 
   async clearPredefinedSourceSelections() {
     const selectedCheckboxes = this.page.locator('input[type="checkbox"]:checked');
-    const selectedCount = await selectedCheckboxes.count();
 
-    for (let index = 0; index < selectedCount; index++) {
-      await selectedCheckboxes.nth(index).uncheck();
+    while (await selectedCheckboxes.count()) {
+      await selectedCheckboxes.first().uncheck();
     }
   }
 

@@ -6,7 +6,7 @@ test.describe(`PSR – API Contract and Behaviour Tests`, () => {
   test(`GET /report/{psrUuid}/defendant-details - A invalid psruuid returns a response with a
   status code of 404 - @smoke @api @regression`, async ({ apiClient, authToken }) => {
     const response = await apiClient.get(
-      `/report/${apiTestData.invalidPSRUUID}/defendant-details}`,
+      `/report/${apiTestData.invalidPSRUUID}/defendant-details`,
       {
         headers: {
           Accept: 'application/json',
@@ -15,8 +15,8 @@ test.describe(`PSR – API Contract and Behaviour Tests`, () => {
       },
     );
     const body = await response.json();
-    console.log('ACTUAL BODY USED IN ASSERT:', body);
     expect(response.status(), 'status should be 404').toBe(404);
-    expect(body.error).toEqual(`Not Found`);
+    expect(body.status).toBe(404);
+    expect(body.message).toMatch(/not found$/);
   });
 });

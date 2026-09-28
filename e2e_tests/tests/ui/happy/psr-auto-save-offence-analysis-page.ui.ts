@@ -27,7 +27,7 @@ test.describe('PSR autosave - Offence analysis page', () => {
 
     await commonFunctions.clickOnLinkByName(page, 'Defendant behaviour and lifestyle assessment');
     await commonFunctions.clickOnLinkByName(page, pageName);
-    await commonFunctions.verifyTextIsPersisted(page, pageName, enteredText);
+    await commonFunctions.verifyTextIsPersisted(page, pageName, editorName, enteredText);
   });
 
   test('persists offence analysis when selecting Save and continue - @smoke @ui @regression @autosave @autosave-save-and-continue', async ({
@@ -41,7 +41,7 @@ test.describe('PSR autosave - Offence analysis page', () => {
 
     await commonFunctions.clickOnButtonByName(page, 'Save and continue');
     await commonFunctions.clickOnLinkByName(page, pageName);
-    await commonFunctions.verifyTextIsPersisted(page, pageName, enteredText);
+    await commonFunctions.verifyTextIsPersisted(page, pageName, editorName, enteredText);
   });
 
   test('persists offence analysis after 15 seconds of inactivity - @smoke @ui @regression @autosave @autosave-inactivity', async ({
@@ -68,6 +68,6 @@ test.describe('PSR autosave - Offence analysis page', () => {
     await psrStartPage.openDefendantDetailsPage();
     await psrDefendantDetailsPage.verifyDefendantDetailsPage();
     await psrDefendantDetailsPage.continueToOffenceAnalysisPage();
-    await commonFunctions.verifyTextIsPersisted(page, pageName, enteredText);
+    await commonFunctions.verifyTextIsPersisted(page, pageName, editorName, enteredText);
   });
 });

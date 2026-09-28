@@ -108,7 +108,7 @@ npx playwright test --project=e2e-tests
 npx playwright test --project=ui-tests --list
 npx playwright test e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts --project=ui-tests --headed
 npx playwright test e2e_tests/tests/ui/unhappy/psr-sources-of-information-page-unhappy.ui.ts --project=ui-tests
-npx playwright test e2e_tests/tests/e2e/happy/psr-happy-journey.e2e.ts --project=e2e-tests
+npx playwright test e2e_tests/tests/e2e/happy/psr-happy-flow.e2e.ts --project=e2e-tests
 ```
 
 Run all UI happy or unhappy-path tests:

@@ -26,13 +26,16 @@ export async function signIn(page: Page) {
     await Promise.race([
       page
         .waitForURL((url) => !url.pathname.includes('/auth/sign-in'), { timeout: 10000 })
-        .catch(() => {}),
-      errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {}),
+        .catch(() => { }),
+      errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => { }),
     ]);
 
     const hasLoginError = await errorSummary.isVisible().catch(() => false);
     const stillOnSignInPage = page.url().includes('/auth/sign-in');
-    const hasSignOut = await signOut.isVisible().catch(() => false);
+    const hasSignOut = await signOut
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
 
     if (!hasLoginError && !stillOnSignInPage && hasSignOut) {
       return;
@@ -56,7 +59,7 @@ export async function signOut(page: Page) {
       timeout: 5_000,
       waitUntil: 'domcontentloaded',
     })
-    .catch(() => {});
+    .catch(() => { });
 }
 
 // Merge pageFixtures + Axe accessibility fixture

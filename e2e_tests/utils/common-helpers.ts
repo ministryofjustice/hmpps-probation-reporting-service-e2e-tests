@@ -150,10 +150,10 @@ export async function fillTextInTextArea(
             textArea = (await inNearestContainer.count())
               ? inNearestContainer.first()
               : fieldLabel
-                  .locator(
-                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                  )
-                  .first();
+                .locator(
+                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                )
+                .first();
           }
         }
       }
@@ -211,9 +211,63 @@ export function waitForAutoSaveConfirmation(page: Page) {
   });
 }
 
-export async function verifyTextIsPersisted(page: Page, pageName: string, text: string) {
+export async function verifyTextIsPersisted(
+  page: Page,
+  pageName: string,
+  editorName: string,
+  text: string,
+) {
   await verifyPageHeadingsByName(page, pageName);
-  await expect(page.getByText(text, { exact: true })).toBeVisible();
+  let editor = page.locator(
+    `textarea[name="${editorName}"]:visible, textarea[id="${editorName}"]:visible, [contenteditable][aria-label="${editorName}"]:visible, [contenteditable][id="${editorName}"]:visible, [contenteditable][name="${editorName}"]:visible`,
+  );
+
+  if (!(await editor.count())) {
+    const editorHeading = page.getByRole('heading', { name: editorName, exact: true }).first();
+    const fieldLabel = (await editorHeading.count())
+      ? editorHeading
+      : page.getByText(editorName, { exact: true }).first();
+    const availableEditors = page.locator('textarea:visible, [contenteditable]:visible');
+    if (!(await fieldLabel.count()) && (await availableEditors.count()) === 1) {
+      editor = availableEditors.first();
+    } else {
+      await expect(fieldLabel).toBeVisible();
+      const inFormGroup = fieldLabel
+        .locator(
+          'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
+        )
+        .first();
+
+      if (await inFormGroup.count()) {
+        editor = inFormGroup;
+      } else {
+        const inNearestContainer = fieldLabel.locator(
+          'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
+        );
+        editor = (await inNearestContainer.count())
+          ? inNearestContainer.first()
+          : fieldLabel
+            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+            .first();
+      }
+    }
+  }
+
+  editor = editor.first();
+  await expect(editor).toBeVisible();
+
+  const isContentEditable = await editor.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    return element.isContentEditable;
+  });
+
+  if (isContentEditable) {
+    await expect(editor).toHaveText(text);
+  } else {
+    await expect(editor).toHaveValue(text);
+  }
 }
 
 export async function verifyTextAreaAutoSavesAfterInactivity(
@@ -229,7 +283,7 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
   await autoSaveConfirmation;
 
   await page.reload();
-  await verifyTextIsPersisted(page, pageName, enteredText);
+  await verifyTextIsPersisted(page, pageName, editorName, enteredText);
 }
 
 export async function selectCheckBoxByName(page: Page, checkBoxName: string) {
