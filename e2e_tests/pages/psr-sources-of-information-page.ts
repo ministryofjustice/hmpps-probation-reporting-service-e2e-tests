@@ -23,9 +23,11 @@ export class PsrSourcesOfInformationPage {
     await this.verifyPageControls();
   }
 
-  async completePsrSourcesOfInformationPage() {
+  async completePsrSourcesOfInformationPage(source = 'Domestic abuse callout information') {
     await commonFunctions.clickOnLinkByName(this.page, 'Sources of information');
     await this.verifyPageControls();
+    await this.selectPredefinedSource(source);
+    await this.continueToReviewYourProgressPage();
   }
 
   async addSource(source: string) {

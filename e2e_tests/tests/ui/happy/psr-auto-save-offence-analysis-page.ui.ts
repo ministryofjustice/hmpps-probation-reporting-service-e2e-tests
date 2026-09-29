@@ -10,6 +10,8 @@ const inactivityText = 'Autosave after 15 seconds of inactivity';
 const signOutText = 'Autosave when signing out';
 
 test.describe('PSR autosave - Offence analysis page', () => {
+  test.describe.configure({ retries: 0 });
+
   test.beforeEach(async ({ psrStartPage, psrDefendantDetailsPage }) => {
     await psrStartPage.openDefendantDetailsPage();
     await psrDefendantDetailsPage.verifyDefendantDetailsPage();

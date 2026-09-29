@@ -5,6 +5,8 @@ const overLimitSource = 'a'.repeat(81);
 const selectedPredefinedSource = 'Domestic abuse callout information';
 
 test.describe('Sources of information page - unhappy paths', () => {
+  test.describe.configure({ retries: 0 });
+
   test.beforeEach(async ({ psrSourcesOfInformationPage }) => {
     await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
   });

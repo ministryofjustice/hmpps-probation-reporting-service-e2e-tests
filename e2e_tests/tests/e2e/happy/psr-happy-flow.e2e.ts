@@ -1,6 +1,8 @@
 import { test } from '@fixtures/e2e-fixture';
 
 test.describe('PSR end-to-end journey', () => {
+  test.describe.configure({ retries: 0 });
+
   test('completes the PSR happy journey - @smoke @e2e @regression', async ({
     psrStartPage,
     psrDefendantDetailsPage,

@@ -150,10 +150,10 @@ export async function fillTextInTextArea(
             textArea = (await inNearestContainer.count())
               ? inNearestContainer.first()
               : fieldLabel
-                .locator(
-                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                )
-                .first();
+                  .locator(
+                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                  )
+                  .first();
           }
         }
       }
@@ -247,8 +247,8 @@ export async function verifyTextIsPersisted(
         editor = (await inNearestContainer.count())
           ? inNearestContainer.first()
           : fieldLabel
-            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
-            .first();
+              .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+              .first();
       }
     }
   }
@@ -278,9 +278,11 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
 ) {
   await verifyPageHeadingsByName(page, pageName);
 
+  const fillStartedAt = Date.now();
   const autoSaveConfirmation = waitForAutoSaveConfirmation(page);
   const enteredText = await fillTextInTextArea(page, textToFill, editorName);
   await autoSaveConfirmation;
+  expect(Date.now() - fillStartedAt).toBeGreaterThanOrEqual(15_000);
 
   await page.reload();
   await verifyTextIsPersisted(page, pageName, editorName, enteredText);
