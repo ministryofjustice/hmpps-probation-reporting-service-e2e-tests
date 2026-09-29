@@ -1,7 +1,10 @@
-const defaultUiBaseUrl = 'https://pre-sentence-service-dev.hmpps.service.justice.gov.uk';
-const envUiBaseUrl = process.env.DEV_PSR_UI_BASE_URL?.trim();
+import { requiredEnvironmentVariable } from '@utils/environment';
 
 export const uiTestData = {
-    uiBaseUrl: envUiBaseUrl || defaultUiBaseUrl,
-    psrUUID: 'e377242b-77c7-4480-9547-b4cc40f798ac',
+  get uiBaseUrl() {
+    return requiredEnvironmentVariable('DEV_PSR_UI_BASE_URL');
+  },
+  get psrUUID() {
+    return requiredEnvironmentVariable('DEV_PSR_UI_PSR_UUID');
+  },
 };

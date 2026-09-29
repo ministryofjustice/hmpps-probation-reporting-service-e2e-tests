@@ -1,8 +1,17 @@
 import { Page } from '@playwright/test';
 import { commonFunctions } from '@utils/common-helpers';
+import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrOffenceAnalysisPage {
-  constructor(public page: Page) {}
+  constructor(
+    public page: Page,
+    private psrUUID = uiTestData.psrUUID,
+  ) {}
+
+  async openPsrOffenceAnalysisPage() {
+    await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/offence-analysis`);
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Offence analysis');
+  }
 
   async completePsrOffenceAnalysisPage() {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Offence analysis');

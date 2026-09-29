@@ -27,7 +27,7 @@
     "test:smoke:chrome:ui": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g smoke",
     "test:regression:chrome:ui": "npm run clean:reports && npx playwright test --project=ui-tests --headed -g regression",
     "test:ui:grep": "npm run clean:reports && npx playwright test --project=ui-tests --grep @ui",
-    "test:accessibility": "npm run clean:reports && npx playwright test --project=ui-tests --grep @accessibility",
+    "test:accessibility": "npm run clean:reports && RUN_ACCESSIBILITY_TESTS=true npx playwright test --project=ui-tests --grep @accessibility",
     "test:debug": "npm run clean:reports && npx playwright test --headed --debug",
     "allure:serve": "allure serve allure-results",
     "build": "tsc",
