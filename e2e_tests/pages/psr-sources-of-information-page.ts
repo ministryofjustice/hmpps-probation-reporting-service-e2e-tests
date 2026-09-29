@@ -64,6 +64,11 @@ export class PsrSourcesOfInformationPage {
     await this.selectPredefinedSource(selectedSource);
     await this.saveAndContinue();
     await this.openPsrSourcesOfInformationPage();
+    await expect(this.page.locator('#added-sources .added-source')).toHaveCount(0);
+    await expect(this.page.locator('input[type="checkbox"]:checked')).toHaveCount(1);
+    await expect(
+      this.page.getByRole('checkbox', { name: selectedSource, exact: true }),
+    ).toBeChecked();
   }
 
   async verifyPageControls() {
