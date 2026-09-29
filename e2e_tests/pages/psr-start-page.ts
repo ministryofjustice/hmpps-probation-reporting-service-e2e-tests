@@ -6,7 +6,7 @@ export class PsrStartPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   async openDefendantDetailsPage() {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Pre-sentence Service');

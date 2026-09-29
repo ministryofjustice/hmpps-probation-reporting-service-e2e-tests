@@ -6,7 +6,7 @@ export class PsrDefendantDetailsPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   async openPsrDefendantDetailsPage() {
     await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/defendant-details`);

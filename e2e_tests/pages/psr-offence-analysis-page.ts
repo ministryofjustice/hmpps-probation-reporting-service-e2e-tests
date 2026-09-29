@@ -6,7 +6,7 @@ export class PsrOffenceAnalysisPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   async openPsrOffenceAnalysisPage() {
     await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/offence-analysis`);

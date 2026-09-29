@@ -45,9 +45,7 @@ e2e_tests/
 
    cp .env.example .env
 
-6. Update .env with valid environment values (usernames, passwords, and any URL overrides you need).
-
-Note: `DEV_PSR_UI_BASE_URL` is optional. If it is unset or left blank, tests fall back to the default dev UI base URL.
+6. Update .env with all required environment values, including the UI base URL, report UUIDs, usernames, and passwords.
 
 ### Quick verification
 
@@ -212,6 +210,18 @@ Source: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
 Environment variables are loaded from `.env`.
 
 Use [/.env.example](.env.example) as the template for required keys.
+
+Required report configuration:
+
+```env
+DEV_PSR_UI_BASE_URL=
+DEV_PSR_UI_PSR_UUID=
+DEV_PSR_E2E_PSR_UUID=
+DEV_PSR_API_PSR_UUID=
+DEV_PSR_API_INVALID_PSR_UUID=
+```
+
+UI and E2E tests use separate report UUIDs so their persistent report data does not overlap. API, UI, and E2E environments can provide different values for local runs, CI/CD pipelines, or stubbed test environments. Keep credentials and local values in `.env`; do not commit that file.
 
 ## Reporting
 

@@ -6,7 +6,7 @@ export class PsrDefendantBehaviourAndLifestyleAssessmentPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   async openPsrDefendantBehaviourAndLifestyleAssessmentPage() {
     const pageUrl = `${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/defendant-behaviour`;
