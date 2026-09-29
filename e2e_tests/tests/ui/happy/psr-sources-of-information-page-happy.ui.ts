@@ -9,6 +9,7 @@ test.describe('Sources of information page - happy paths', () => {
 
   test.beforeEach(async ({ psrSourcesOfInformationPage }) => {
     await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
+    await psrSourcesOfInformationPage.resetToBaseline(selectedPredefinedSource);
   });
 
   test('shows predefined source options - @smoke @ui @regression @sources-information', async ({

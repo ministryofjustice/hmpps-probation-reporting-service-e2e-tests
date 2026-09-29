@@ -9,6 +9,7 @@ test.describe('Sources of information page - unhappy paths', () => {
 
   test.beforeEach(async ({ psrSourcesOfInformationPage }) => {
     await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
+    await psrSourcesOfInformationPage.resetToBaseline(selectedPredefinedSource);
   });
 
   test('rejects an unlisted source on save - @ui @regression @sources-information', async ({
@@ -23,9 +24,6 @@ test.describe('Sources of information page - unhappy paths', () => {
   test('requires at least one source - @ui @regression @sources-information', async ({
     psrSourcesOfInformationPage,
   }) => {
-    await psrSourcesOfInformationPage.clearManuallyAddedSources();
-    await psrSourcesOfInformationPage.saveAndContinue();
-    await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
     await psrSourcesOfInformationPage.clearPredefinedSourceSelections();
     await psrSourcesOfInformationPage.saveAndContinue();
     await psrSourcesOfInformationPage.verifyValidationError(
@@ -61,11 +59,12 @@ test.describe('Sources of information page - unhappy paths', () => {
     psrSourcesOfInformationPage,
   }) => {
     await page.getByRole('checkbox', { name: selectedPredefinedSource, exact: true }).check();
-    await psrSourcesOfInformationPage.enterSource(overLimitSource);
+    const unlistedSource = `${sourcePrefix}-not-added-before-continue`;
+    await psrSourcesOfInformationPage.enterSource(unlistedSource);
     await psrSourcesOfInformationPage.saveAndContinue();
     await psrSourcesOfInformationPage.verifyValidationError(
       'Add this source to the list',
-      overLimitSource,
+      unlistedSource,
     );
   });
 

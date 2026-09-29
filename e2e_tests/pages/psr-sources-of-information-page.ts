@@ -7,7 +7,7 @@ export class PsrSourcesOfInformationPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) {}
+  ) { }
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
@@ -56,6 +56,14 @@ export class PsrSourcesOfInformationPage {
     while ((await removeButtons.count()) > 0) {
       await removeButtons.first().click();
     }
+  }
+
+  async resetToBaseline(selectedSource: string) {
+    await this.clearManuallyAddedSources();
+    await this.clearPredefinedSourceSelections();
+    await this.selectPredefinedSource(selectedSource);
+    await this.saveAndContinue();
+    await this.openPsrSourcesOfInformationPage();
   }
 
   async verifyPageControls() {
