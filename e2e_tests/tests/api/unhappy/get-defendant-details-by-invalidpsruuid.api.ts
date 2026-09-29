@@ -16,7 +16,9 @@ test.describe(`PSR – API Contract and Behaviour Tests`, () => {
     );
     const body = await response.json();
     expect(response.status(), 'status should be 404').toBe(404);
-    expect(body.status).toBe(404);
-    expect(body.message).toMatch(/not found$/);
+    expect(body).toMatchObject({
+      status: 404,
+      message: expect.stringMatching(/not found$/i),
+    });
   });
 });
