@@ -26,8 +26,8 @@ export async function signIn(page: Page) {
     await Promise.race([
       page
         .waitForURL((url) => !url.pathname.includes('/auth/sign-in'), { timeout: 10000 })
-        .catch(() => { }),
-      errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => { }),
+        .catch(() => {}),
+      errorSummary.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {}),
     ]);
 
     const hasLoginError = await errorSummary.isVisible().catch(() => false);
