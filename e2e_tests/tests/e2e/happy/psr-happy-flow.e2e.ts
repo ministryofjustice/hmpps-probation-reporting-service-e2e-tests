@@ -22,6 +22,7 @@ test.describe('PSR end-to-end journey', () => {
     await psrRiskAnalysisPage.completePsrRiskAnalysisPage();
     await psrRiskAnalysisPage.continueToSentencingProposalPage();
     await psrSentencingProposalPage.completePsrSentencingProposalPage();
+    await psrSentencingProposalPage.continueToSourcesOfInformationPage();
     await psrSourcesOfInformationPage.completePsrSourcesOfInformationPage();
   });
 });

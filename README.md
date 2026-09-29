@@ -67,7 +67,7 @@ Run these commands to verify setup:
 | UI   | .ui.ts  | Browser UI validation                      |
 | E2E  | .e2e.ts | Complete browser journeys across PSR pages |
 
-Current coverage includes API checks, direct-route UI page tests, an offence-analysis autosave suite, Sources of information tests, and an E2E journey from Sentencing proposal to Sources of information.
+Current coverage includes API checks, direct-route UI page tests, an offence-analysis autosave suite, Sources of information tests, and an E2E journey from Defendant details through Sentencing proposal and Sources of information to Review your progress.
 
 ## Test Architecture
 
@@ -87,7 +87,7 @@ Current coverage includes API checks, direct-route UI page tests, an offence-ana
 - Sentencing proposal, including the conditional custodial-sentence field
 - Sources of information, including predefined selections, custom source add/remove, validation, persistence, and character-limit behavior
 - Offence analysis autosave triggers
-- E2E journey through Sentencing proposal to Sources of information
+- E2E journey through Sentencing proposal and Sources of information to Review your progress
 
 ## Run Commands
 
