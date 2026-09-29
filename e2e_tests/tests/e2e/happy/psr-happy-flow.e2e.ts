@@ -1,4 +1,4 @@
-import { test } from '@fixtures/ui-auth-fixture';
+import { test } from '@fixtures/e2e-fixture';
 
 test.describe('PSR end-to-end journey', () => {
   test('completes the PSR happy journey - @smoke @e2e @regression', async ({

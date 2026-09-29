@@ -3,10 +3,13 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrRiskAnalysisPage {
-  constructor(public page: Page) {}
+  constructor(
+    public page: Page,
+    private psrUUID = uiTestData.psrUUID,
+  ) { }
 
   async openPsrRiskAnalysisPage() {
-    await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${uiTestData.psrUUID}/risk-analysis`);
+    await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/risk-analysis`);
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Risk analysis');
   }
 

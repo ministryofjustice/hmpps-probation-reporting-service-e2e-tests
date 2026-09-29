@@ -4,7 +4,10 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSourcesOfInformationPage {
-  constructor(public page: Page) { }
+  constructor(
+    public page: Page,
+    private psrUUID = uiTestData.psrUUID,
+  ) { }
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
@@ -15,7 +18,7 @@ export class PsrSourcesOfInformationPage {
   }
 
   async openPsrSourcesOfInformationPage() {
-    const sourcesUrl = `${uiTestData.uiBaseUrl}/psr/${uiTestData.psrUUID}/sources-of-information`;
+    const sourcesUrl = `${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/sources-of-information`;
     await this.page.goto(sourcesUrl);
     await this.verifyPageControls();
   }

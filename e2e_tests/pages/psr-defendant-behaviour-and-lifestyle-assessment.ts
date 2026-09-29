@@ -3,10 +3,13 @@ import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrDefendantBehaviourAndLifestyleAssessmentPage {
-  constructor(public page: Page) {}
+  constructor(
+    public page: Page,
+    private psrUUID = uiTestData.psrUUID,
+  ) { }
 
   async openPsrDefendantBehaviourAndLifestyleAssessmentPage() {
-    const pageUrl = `${uiTestData.uiBaseUrl}/psr/${uiTestData.psrUUID}/defendant-behaviour`;
+    const pageUrl = `${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/defendant-behaviour`;
     await this.page.goto(pageUrl);
     await commonFunctions.verifyPageHeadingsByName(
       this.page,
