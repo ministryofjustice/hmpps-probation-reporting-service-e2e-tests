@@ -12,12 +12,13 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  //workers: process.env.CI ? 1 : undefined,
+  /* All projects share one UI login; parallel sign-outs break other workers' sessions. */
+  workers: 1,
+  timeout: 60_000,
+  globalTimeout: 30 * 60_000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    //['html', { open: 'never' }],
-    //['list', { open: 'never' }],
+    ['list'],
     [
       'allure-playwright',
       {
@@ -52,7 +53,7 @@ export default defineConfig({
       },
       testMatch: [/.*\.(api)\.ts$/],
       outputDir: 'allure-results/api',
-      workers: 4, // fast and parallel API tests
+      workers: 1, // few API tests, so parallel workers add no benefit
     },
     // {
     //   name: 'ui-tests',

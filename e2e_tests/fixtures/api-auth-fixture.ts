@@ -6,7 +6,7 @@ type apiFixtures = {
 };
 
 export const test = base.extend<apiFixtures>({
-  apiClient: async ({}, use) => {
+  apiClient: async ({ }, use) => {
     const api = await request.newContext({
       baseURL: process.env.DEV_PSR_API_BASE_URL!,
       extraHTTPHeaders: {
@@ -16,6 +16,7 @@ export const test = base.extend<apiFixtures>({
     });
 
     await use(api);
+    await api.dispose();
   },
 
   authToken: async ({ apiClient }, use) => {

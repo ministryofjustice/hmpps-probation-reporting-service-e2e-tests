@@ -64,6 +64,27 @@ export async function verifyPageHeadingsByName(page: Page, pageHeadingName: stri
   });
 }
 
+export async function verifyValidationError(
+  page: Page,
+  fieldId: string,
+  message: string,
+  value?: string,
+) {
+  const errorSummary = page.locator('.govuk-error-summary');
+  await expect(errorSummary).toBeVisible();
+  await expect(errorSummary).toContainText(message);
+  await expect(page.locator(`#${fieldId}-error`)).toContainText(message);
+
+  if (value !== undefined) {
+    await expect(page.locator(`#${fieldId}`)).toHaveValue(value);
+  }
+}
+
+export async function verifyCharacterCountMessage(page: Page, fieldId: string, message: string) {
+  await expect(page.locator(`#${fieldId}-info`)).toHaveText(message);
+  await expect(page.locator('.govuk-error-summary')).not.toBeVisible();
+}
+
 function getOptionalTestInfo() {
   try {
     return test.info();
@@ -150,10 +171,10 @@ export async function fillTextInTextArea(
             textArea = (await inNearestContainer.count())
               ? inNearestContainer.first()
               : fieldLabel
-                .locator(
-                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                )
-                .first();
+                  .locator(
+                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                  )
+                  .first();
           }
         }
       }
@@ -247,8 +268,8 @@ export async function verifyTextIsPersisted(
         editor = (await inNearestContainer.count())
           ? inNearestContainer.first()
           : fieldLabel
-            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
-            .first();
+              .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+              .first();
       }
     }
   }
@@ -288,10 +309,10 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
   await verifyTextIsPersisted(page, pageName, editorName, enteredText);
 }
 
-export async function selectCheckBoxByName(page: Page, checkBoxName: string) {
-  await page.getByRole('checkbox', { name: `${checkBoxName}` }).check();
-  const isChecked = await page.getByRole('checkbox', { name: `${checkBoxName}` }).isChecked();
-  expect(isChecked).toBeTruthy();
+export async function selectCheckBoxByName(page: Page, checkBoxName: string, exact = false) {
+  const checkbox = page.getByRole('checkbox', { name: checkBoxName, exact });
+  await checkbox.check();
+  await expect(checkbox).toBeChecked();
 }
 
 export async function selectRadioButtonByName(page: Page, radioName: string) {
@@ -339,6 +360,8 @@ export const commonFunctions = {
   waitForAutoSaveConfirmation,
   verifyTextIsPersisted,
   verifyTextAreaAutoSavesAfterInactivity,
+  verifyValidationError,
+  verifyCharacterCountMessage,
   selectCheckBoxByName,
   selectRadioButtonByName,
   selectDropdownOption,

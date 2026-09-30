@@ -1,7 +1,12 @@
+import { commonFunctions } from '@utils/common-helpers';
+import { generateRandomParagraph } from '@utils/random-paragraph-generator';
 import { test } from '@fixtures/ui-auth-fixture';
 
 const sourcePrefix = `Automation source ${Date.now()}`;
-const maximumLengthSource = `${sourcePrefix}-${'a'.repeat(80 - sourcePrefix.length - 1)}`;
+const maximumLengthSource = generateRandomParagraph(80, {
+  includeSpaces: false,
+  includeSpecialCharacters: false,
+});
 const selectedPredefinedSource = 'Domestic abuse callout information';
 
 test.describe('Sources of information page - happy paths', () => {
@@ -22,27 +27,27 @@ test.describe('Sources of information page - happy paths', () => {
   });
 
   test('saves a source and opens Review your progress - @smoke @ui @regression @sources-information', async ({
+    page,
     psrSourcesOfInformationPage,
   }) => {
-    await psrSourcesOfInformationPage.selectPredefinedSource(selectedPredefinedSource);
+    await commonFunctions.selectCheckBoxByName(page, selectedPredefinedSource, true);
     await psrSourcesOfInformationPage.continueToReviewYourProgressPage();
   });
 
   test('adds a source at the 80-character limit - @smoke @ui @regression @sources-information', async ({
     psrSourcesOfInformationPage,
   }) => {
-    const selectionBeforeAdding =
-      await psrSourcesOfInformationPage.isPredefinedSourceSelected(selectedPredefinedSource);
     await psrSourcesOfInformationPage.addSource(maximumLengthSource);
     await psrSourcesOfInformationPage.verifyRemoveButtonIsVisible(maximumLengthSource);
     await psrSourcesOfInformationPage.verifyPredefinedSourceSelection(
       selectedPredefinedSource,
-      selectionBeforeAdding,
+      true,
     );
   });
 
-  test('adds multiple sources of information - @smoke @ui @regression @sources-information', async ({
+  test('adds multiple sources of information - @smoke @ui @regression @accessibility @sources-information', async ({
     psrSourcesOfInformationPage,
+    makeAxeBuilder,
   }) => {
     const sources = [
       `${sourcePrefix}-multiple-one`,
@@ -54,14 +59,16 @@ test.describe('Sources of information page - happy paths', () => {
     for (const source of sources) {
       await psrSourcesOfInformationPage.verifyRemoveButtonIsVisible(source);
     }
+    await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
   });
 
   test('persists a source after Save and continue - @smoke @ui @regression @sources-information', async ({
+    page,
     psrSourcesOfInformationPage,
   }) => {
     const source = `${sourcePrefix}-saved`;
     await psrSourcesOfInformationPage.addSource(source);
-    await psrSourcesOfInformationPage.saveAndContinue();
+    await commonFunctions.clickOnButtonByName(page, 'Save and continue');
     await psrSourcesOfInformationPage.openPsrSourcesOfInformationPage();
     await psrSourcesOfInformationPage.verifyRemoveButtonIsVisible(source);
   });
@@ -71,15 +78,13 @@ test.describe('Sources of information page - happy paths', () => {
   }) => {
     const sourceToRemove = `${sourcePrefix}-remove`;
     const sourceToKeep = `${sourcePrefix}-keep`;
-    const selectionBeforeRemoving =
-      await psrSourcesOfInformationPage.isPredefinedSourceSelected(selectedPredefinedSource);
 
     await psrSourcesOfInformationPage.addSources([sourceToRemove, sourceToKeep]);
     await psrSourcesOfInformationPage.removeSource(sourceToRemove);
     await psrSourcesOfInformationPage.verifyRemoveButtonIsVisible(sourceToKeep);
     await psrSourcesOfInformationPage.verifyPredefinedSourceSelection(
       selectedPredefinedSource,
-      selectionBeforeRemoving,
+      true,
     );
   });
 });

@@ -2,6 +2,8 @@ import { Page } from '@playwright/test';
 import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
+export const defendantBehaviourField = 'defendantBehaviour';
+
 export class PsrDefendantBehaviourAndLifestyleAssessmentPage {
   constructor(
     public page: Page,
@@ -22,12 +24,7 @@ export class PsrDefendantBehaviourAndLifestyleAssessmentPage {
       this.page,
       'Defendant behaviour and lifestyle assessment',
     );
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      20000,
-      'Editor editing area: main',
-      'readable',
-    );
+    await commonFunctions.fillTextInTextArea(this.page, 20000, defendantBehaviourField, 'readable');
   }
 
   async continueToRiskAnalysisPage() {

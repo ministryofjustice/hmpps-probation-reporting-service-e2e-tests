@@ -287,6 +287,13 @@ This means every test can call the same builder and run consistent accessibility
 await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
 ```
 
+### Where scans run
+
+- Each page has one `@accessibility` scan in its happy-path suite.
+- Pages with validation also scan each distinct error layout in their unhappy-path suite (for example, a checkbox-group error, a text-input error, or a character-count error), because error summaries, inline errors, and `aria-describedby` links only render when validation fails.
+- Unhappy tests that only change the error text reuse an existing layout and are not scanned again.
+- Call the scan after asserting the state, so Axe runs against the fully rendered page.
+
 ### Run accessibility-only tests
 
 ```bash
