@@ -1,0 +1,369 @@
+import { Page, expect, test } from '@playwright/test';
+import {
+  RandomParagraphMode,
+  generateRandomParagraph,
+  generateReadableRandomParagraph,
+} from 'root/psr_tests/utils/random-paragraph-generator';
+
+import AxeBuilder from '@axe-core/playwright';
+
+function formatAccessibilitySummary(results: Awaited<ReturnType<AxeBuilder['analyze']>>) {
+  if (results.violations.length === 0) {
+    return 'No accessibility violations were detected.';
+  }
+
+  return results.violations
+    .map((violation, index) => {
+      const impactedNodes = violation.nodes
+        .map((node, nodeIndex) => {
+          const target = node.target.join(' | ');
+          const failureSummary = node.failureSummary ?? 'No failure summary provided';
+          return [
+            `  ${nodeIndex + 1}. Target: ${target}`,
+            `     HTML: ${node.html}`,
+            `     Failure: ${failureSummary.replace(/\n/g, ' ')}`,
+          ].join('\n');
+        })
+        .join('\n');
+
+      return [
+        `${index + 1}. ${violation.id} (${violation.impact ?? 'unknown impact'})`,
+        `   Help: ${violation.help}`,
+        `   Description: ${violation.description}`,
+        `   More info: ${violation.helpUrl}`,
+        `   Affected nodes:`,
+        impactedNodes,
+      ].join('\n');
+    })
+    .join('\n\n');
+}
+
+export async function clickOnLinkByName(page: Page, linkName: string) {
+  await page.getByRole('link', { name: `${linkName}` }).click();
+}
+
+export async function searchBox(page: Page, searchName: string) {
+  await page.getByRole('textbox', { name: 'Enter the CRN or full name of' }).fill(searchName);
+}
+
+export async function verifyPageByText(page: Page, pageTextName: string) {
+  await expect(page.getByText(`${pageTextName}`).first()).toBeVisible();
+}
+
+export async function verifyLinkIsVisibleByName(page: Page, linkName: string) {
+  await expect(page.getByRole('link', { name: `${linkName}`, exact: true })).toBeVisible();
+}
+
+export async function clickOnButtonByName(page: Page, buttonName: string) {
+  await page.getByRole('button', { name: `${buttonName}` }).click();
+}
+
+export async function verifyPageHeadingsByName(page: Page, pageHeadingName: string) {
+  await expect(page.getByRole('heading', { name: `${pageHeadingName}`, exact: true })).toBeVisible({
+    timeout: 5000,
+  });
+}
+
+export async function verifyValidationError(
+  page: Page,
+  fieldId: string,
+  message: string,
+  value?: string,
+) {
+  const errorSummary = page.locator('.govuk-error-summary');
+  await expect(errorSummary).toBeVisible();
+  await expect(errorSummary).toContainText(message);
+  await expect(page.locator(`#${fieldId}-error`)).toContainText(message);
+
+  if (value !== undefined) {
+    await expect(page.locator(`#${fieldId}`)).toHaveValue(value);
+  }
+}
+
+export async function verifyCharacterCountMessage(page: Page, fieldId: string, message: string) {
+  await expect(page.locator(`#${fieldId}-info`)).toHaveText(message);
+  await expect(page.locator('.govuk-error-summary')).not.toBeVisible();
+}
+
+function getOptionalTestInfo() {
+  try {
+    return test.info();
+  } catch {
+    return undefined;
+  }
+}
+
+export async function verifyNoAccessibilityViolations(makeAxeBuilder: () => AxeBuilder) {
+  if (process.env.RUN_ACCESSIBILITY_TESTS !== 'true') {
+    return;
+  }
+
+  const results = await makeAxeBuilder().analyze();
+  const summary = formatAccessibilitySummary(results);
+  const testInfo = getOptionalTestInfo();
+
+  if (testInfo) {
+    await testInfo.attach('accessibility-summary', {
+      body: Buffer.from(summary, 'utf-8'),
+      contentType: 'text/plain',
+    });
+
+    await testInfo.attach('accessibility-violations', {
+      body: Buffer.from(JSON.stringify(results.violations, null, 2), 'utf-8'),
+      contentType: 'application/json',
+    });
+  }
+
+  expect(results.violations.length, `Accessibility violations detected:\n\n${summary}`).toBe(0);
+}
+
+export async function fillTextInTextArea(
+  page: Page,
+  textOrLength: string | number = 'AUTO-TESTING',
+  textAreaKey?: string,
+  randomMode: RandomParagraphMode = 'readable',
+) {
+  let textArea = page.locator('textarea:visible, [contenteditable]:visible');
+
+  if (textAreaKey) {
+    const byNameOrId = page.locator(
+      `textarea[name="${textAreaKey}"]:visible, textarea[id="${textAreaKey}"]:visible, [contenteditable][aria-label="${textAreaKey}"]:visible, [contenteditable][id="${textAreaKey}"]:visible, [contenteditable][name="${textAreaKey}"]:visible`,
+    );
+
+    if (await byNameOrId.count()) {
+      textArea = byNameOrId.first();
+    } else {
+      const byAccessibleName = page
+        .getByRole('textbox', { name: textAreaKey, exact: true })
+        .first();
+
+      if (await byAccessibleName.count()) {
+        textArea = byAccessibleName;
+      } else {
+        const heading = page
+          .getByRole('heading', {
+            name: textAreaKey,
+            exact: true,
+          })
+          .first();
+
+        const fieldLabel = (await heading.count())
+          ? heading
+          : page.getByText(textAreaKey, { exact: true }).first();
+
+        const availableTextAreas = page.locator('textarea:visible, [contenteditable]:visible');
+        if (!(await fieldLabel.count()) && (await availableTextAreas.count()) === 1) {
+          textArea = availableTextAreas.first();
+        } else {
+          await expect(fieldLabel).toBeVisible();
+
+          const inFormGroup = fieldLabel
+            .locator(
+              'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
+            )
+            .first();
+          if (await inFormGroup.count()) {
+            textArea = inFormGroup;
+          } else {
+            const inNearestContainer = fieldLabel.locator(
+              'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
+            );
+            textArea = (await inNearestContainer.count())
+              ? inNearestContainer.first()
+              : fieldLabel
+                  .locator(
+                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                  )
+                  .first();
+          }
+        }
+      }
+    }
+  }
+
+  const matches = await textArea.count();
+  if (matches === 0) {
+    throw new Error('No textarea found. Pass textarea name/id, label, or heading text.');
+  }
+
+  if (!textAreaKey && matches > 1) {
+    throw new Error(
+      'Multiple textareas found. Pass textarea name/id, label, or heading text to disambiguate.',
+    );
+  }
+
+  textArea = textArea.first();
+
+  const textToFill =
+    typeof textOrLength === 'number'
+      ? randomMode === 'readable'
+        ? generateReadableRandomParagraph(textOrLength)
+        : generateRandomParagraph(textOrLength)
+      : textOrLength;
+
+  await textArea.click();
+  await expect(textArea).toBeEditable();
+
+  const isContentEditable = await textArea.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    return element.isContentEditable;
+  });
+
+  if (isContentEditable) {
+    await textArea.press('ControlOrMeta+A');
+    await textArea.press('Backspace');
+    await expect(textArea).toHaveText('');
+  } else {
+    await textArea.clear();
+    await expect(textArea).toHaveValue('');
+  }
+
+  await textArea.fill(textToFill);
+
+  return textToFill;
+}
+
+export function waitForAutoSaveConfirmation(page: Page) {
+  return page.waitForEvent('console', {
+    predicate: (message) => message.text().includes('Report saved successfully'),
+    timeout: 20_000,
+  });
+}
+
+export async function verifyTextIsPersisted(
+  page: Page,
+  pageName: string,
+  editorName: string,
+  text: string,
+) {
+  await verifyPageHeadingsByName(page, pageName);
+  let editor = page.locator(
+    `textarea[name="${editorName}"]:visible, textarea[id="${editorName}"]:visible, [contenteditable][aria-label="${editorName}"]:visible, [contenteditable][id="${editorName}"]:visible, [contenteditable][name="${editorName}"]:visible`,
+  );
+
+  if (!(await editor.count())) {
+    const editorHeading = page.getByRole('heading', { name: editorName, exact: true }).first();
+    const fieldLabel = (await editorHeading.count())
+      ? editorHeading
+      : page.getByText(editorName, { exact: true }).first();
+    const availableEditors = page.locator('textarea:visible, [contenteditable]:visible');
+    if (!(await fieldLabel.count()) && (await availableEditors.count()) === 1) {
+      editor = availableEditors.first();
+    } else {
+      await expect(fieldLabel).toBeVisible();
+      const inFormGroup = fieldLabel
+        .locator(
+          'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
+        )
+        .first();
+
+      if (await inFormGroup.count()) {
+        editor = inFormGroup;
+      } else {
+        const inNearestContainer = fieldLabel.locator(
+          'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
+        );
+        editor = (await inNearestContainer.count())
+          ? inNearestContainer.first()
+          : fieldLabel
+              .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+              .first();
+      }
+    }
+  }
+
+  editor = editor.first();
+  await expect(editor).toBeVisible();
+
+  const isContentEditable = await editor.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    return element.isContentEditable;
+  });
+
+  if (isContentEditable) {
+    await expect(editor).toHaveText(text);
+  } else {
+    await expect(editor).toHaveValue(text);
+  }
+}
+
+export async function verifyTextAreaAutoSavesAfterInactivity(
+  page: Page,
+  editorName: string,
+  pageName: string,
+  textToFill: string,
+) {
+  await verifyPageHeadingsByName(page, pageName);
+
+  const autoSaveConfirmation = waitForAutoSaveConfirmation(page);
+  const enteredText = await fillTextInTextArea(page, textToFill, editorName);
+  const fillCompletedAt = Date.now();
+  await autoSaveConfirmation;
+  expect(Date.now() - fillCompletedAt).toBeGreaterThanOrEqual(15_000);
+
+  await page.reload();
+  await verifyTextIsPersisted(page, pageName, editorName, enteredText);
+}
+
+export async function selectCheckBoxByName(page: Page, checkBoxName: string, exact = false) {
+  const checkbox = page.getByRole('checkbox', { name: checkBoxName, exact });
+  await checkbox.check();
+  await expect(checkbox).toBeChecked();
+}
+
+export async function selectRadioButtonByName(page: Page, radioName: string) {
+  const radio = page.getByRole('radio', { name: radioName, exact: true });
+  await radio.check();
+  await expect(radio).toBeChecked();
+}
+
+export async function selectDropdownOption(page: Page, dropdownName: string, optionLabel: string) {
+  const dropdownByIdOrName = page
+    .locator(`select[name="${dropdownName}"], select[id="${dropdownName}"]`)
+    .first();
+
+  const dropdown = (await dropdownByIdOrName.count())
+    ? dropdownByIdOrName
+    : page.getByRole('combobox', { name: dropdownName, exact: true }).first();
+
+  await expect(dropdown).toBeVisible();
+  await dropdown.selectOption({ label: optionLabel });
+  await expect(dropdown.locator('option:checked')).toHaveText(optionLabel);
+}
+
+export async function selectDropdownOptions(
+  page: Page,
+  dropdownName: string,
+  optionValues: string[],
+) {
+  // Select and verify every supplied option; the final option remains selected.
+  for (const optionValue of optionValues) {
+    await selectDropdownOption(page, dropdownName, optionValue);
+  }
+}
+
+export const commonFunctions = {
+  clickOnLinkByName,
+  searchBox,
+  verifyPageByText,
+  verifyLinkIsVisibleByName,
+  clickOnButtonByName,
+  verifyPageHeadingsByName,
+  verifyNoAccessibilityViolations,
+  generateRandomParagraph,
+  generateReadableRandomParagraph,
+  fillTextInTextArea,
+  waitForAutoSaveConfirmation,
+  verifyTextIsPersisted,
+  verifyTextAreaAutoSavesAfterInactivity,
+  verifyValidationError,
+  verifyCharacterCountMessage,
+  selectCheckBoxByName,
+  selectRadioButtonByName,
+  selectDropdownOption,
+  selectDropdownOptions,
+};

@@ -22,13 +22,27 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@tests/*": ["./e2e_tests/tests/*"],
-      "@utils/*": ["./e2e_tests/utils/*"],
-      "@test-data/*": ["./e2e_tests/test-data/*"],
-      "@pages/*": ["./e2e_tests/pages/*"],
-      "@fixtures/*": ["./e2e_tests/fixtures/*"],
-      "@env-config/*": ["./e2e_tests/env-config/*"],
-      "root/*": ["./*"]
+      "@tests/*": [
+        "psr_tests/tests/*"
+      ],
+      "@utils/*": [
+        "psr_tests/utils/*"
+      ],
+      "@test-data/*": [
+        "psr_tests/test-data/*"
+      ],
+      "@pages/*": [
+        "psr_tests/pages/*"
+      ],
+      "@fixtures/*": [
+        "psr_tests/fixtures/*"
+      ],
+      "@env-config/*": [
+        "psr_tests/env-config/*"
+      ],
+      "root/*": [
+        "./*"
+      ]
     },
     "ignoreDeprecations": "6.0"
   },
@@ -41,6 +55,8 @@
     "playwright.config.ts",
     "allure-report/**/*.js"
   ],
-  "include": ["**/*.ts", "**/*.js"]
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ]
 }
-

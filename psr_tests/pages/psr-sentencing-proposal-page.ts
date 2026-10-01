@@ -1,0 +1,52 @@
+import { Page } from '@playwright/test';
+import { commonFunctions } from 'root/psr_tests/utils/common-helpers';
+import { uiTestData } from 'root/psr_tests/test-data/ui.test-data';
+
+export class PsrSentencingProposalPage {
+  constructor(
+    public page: Page,
+    private psrUUID = uiTestData.psrUUID,
+  ) {}
+
+  async openPsrSentencingProposalPage() {
+    await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/sentencing-proposal`);
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Sentencing proposal');
+  }
+
+  async completePsrSentencingProposalPage() {
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Sentencing proposal');
+    await commonFunctions.fillTextInTextArea(
+      this.page,
+      4000,
+      'Enter the proposed sentence',
+      'readable',
+    );
+    await commonFunctions.fillTextInTextArea(
+      this.page,
+      20000,
+      'Explain your rationale for the proposed sentence',
+      'readable',
+    );
+    await commonFunctions.fillTextInTextArea(
+      this.page,
+      20000,
+      'Outline alternative sentencing options',
+      'readable',
+    );
+    await commonFunctions.selectRadioButtonByName(
+      this.page,
+      'A custodial sentence is possible or expected',
+    );
+    await commonFunctions.fillTextInTextArea(
+      this.page,
+      20000,
+      'Explain the impact of a custodial sentence if relevant',
+      'readable',
+    );
+  }
+
+  async continueToSourcesOfInformationPage() {
+    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
+    await commonFunctions.verifyPageHeadingsByName(this.page, 'Sources of information');
+  }
+}

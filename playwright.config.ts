@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 dotenv.config();
 
 export default defineConfig({
-  testDir: './e2e_tests/tests',
+  testDir: './psr_tests/tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
