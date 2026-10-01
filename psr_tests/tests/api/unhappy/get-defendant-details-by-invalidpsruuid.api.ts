@@ -1,6 +1,6 @@
-import { expect, test } from 'root/psr_tests/fixtures/api-auth-fixture';
+import { expect, test } from '@fixtures/api-auth-fixture';
 
-import { apiTestData } from 'root/psr_tests/test-data/api.test-data';
+import { apiTestData } from '@test-data/api.test-data';
 
 test.describe(`PSR – API Contract and Behaviour Tests`, () => {
   test(`GET /report/{psrUuid}/defendant-details - A invalid psruuid returns a response with a

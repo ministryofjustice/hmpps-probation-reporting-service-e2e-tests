@@ -1,6 +1,6 @@
-import { commonFunctions } from 'root/psr_tests/utils/common-helpers';
-import { generateRandomParagraph } from 'root/psr_tests/utils/random-paragraph-generator';
-import { test } from 'root/psr_tests/fixtures/ui-auth-fixture';
+import { commonFunctions } from '@utils/common-helpers';
+import { generateRandomParagraph } from '@utils/random-paragraph-generator';
+import { test } from '@fixtures/ui-auth-fixture';
 
 const sourcePrefix = `Automation source ${Date.now()}`;
 const overLimitSource = generateRandomParagraph(81, {

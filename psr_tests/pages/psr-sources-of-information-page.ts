@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
-import { commonFunctions } from 'root/psr_tests/utils/common-helpers';
-import { uiTestData } from 'root/psr_tests/test-data/ui.test-data';
+import { commonFunctions } from '@utils/common-helpers';
+import { uiTestData } from '@test-data/ui.test-data';
 
 export class PsrSourcesOfInformationPage {
   constructor(

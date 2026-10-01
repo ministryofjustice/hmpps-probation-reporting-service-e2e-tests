@@ -1,7 +1,7 @@
-import { commonFunctions } from 'root/psr_tests/utils/common-helpers';
-import { defendantBehaviourField } from 'root/psr_tests/pages/psr-defendant-behaviour-and-lifestyle-assessment';
-import { generateRandomParagraph } from 'root/psr_tests/utils/random-paragraph-generator';
-import { test } from 'root/psr_tests/fixtures/ui-auth-fixture';
+import { commonFunctions } from '@utils/common-helpers';
+import { defendantBehaviourField } from '@pages/psr-defendant-behaviour-and-lifestyle-assessment';
+import { generateRandomParagraph } from '@utils/random-paragraph-generator';
+import { test } from '@fixtures/ui-auth-fixture';
 
 const pageName = 'Defendant behaviour and lifestyle assessment';
 const maximumLength = 20000;

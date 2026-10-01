@@ -1,6 +1,6 @@
-import { signIn, signOut, test } from 'root/psr_tests/fixtures/ui-auth-fixture';
+import { signIn, signOut, test } from '@fixtures/ui-auth-fixture';
 
-import { commonFunctions } from 'root/psr_tests/utils/common-helpers';
+import { commonFunctions } from '@utils/common-helpers';
 
 const pageName = 'Offence analysis';
 const editorName = 'Analyse previous offending behaviour and response to supervision';

@@ -3,7 +3,7 @@ import {
   RandomParagraphMode,
   generateRandomParagraph,
   generateReadableRandomParagraph,
-} from 'root/psr_tests/utils/random-paragraph-generator';
+} from '@utils/random-paragraph-generator';
 
 import AxeBuilder from '@axe-core/playwright';
 

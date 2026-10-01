@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
 import AxeBuilder from '@axe-core/playwright';
-import { pageFixtures } from 'root/psr_tests/fixtures/page-fixtures';
+import { pageFixtures } from '@fixtures/page-fixtures';
 
 type AxeFixture = {
   makeAxeBuilder: () => AxeBuilder;

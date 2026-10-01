@@ -1,4 +1,4 @@
-import { requiredEnvironmentVariable } from 'root/psr_tests/utils/environment';
+import { requiredEnvironmentVariable } from '@utils/environment';
 
 export const apiTestData = {
   psrUUID: requiredEnvironmentVariable('DEV_PSR_API_PSR_UUID'),

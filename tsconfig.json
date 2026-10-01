@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "types": [
       "node",
       "playwright",
@@ -20,31 +20,26 @@
     "isolatedModules": false,
     "noUncheckedSideEffectImports": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
       "@tests/*": [
-        "psr_tests/tests/*"
+        "./psr_tests/tests/*"
       ],
       "@utils/*": [
-        "psr_tests/utils/*"
+        "./psr_tests/utils/*"
       ],
       "@test-data/*": [
-        "psr_tests/test-data/*"
+        "./psr_tests/test-data/*"
       ],
       "@pages/*": [
-        "psr_tests/pages/*"
+        "./psr_tests/pages/*"
       ],
       "@fixtures/*": [
-        "psr_tests/fixtures/*"
+        "./psr_tests/fixtures/*"
       ],
       "@env-config/*": [
-        "psr_tests/env-config/*"
-      ],
-      "root/*": [
-        "./*"
+        "./psr_tests/env-config/*"
       ]
-    },
-    "ignoreDeprecations": "6.0"
+    }
   },
   "exclude": [
     "node_modules",

@@ -1,4 +1,4 @@
-import { test } from 'root/psr_tests/fixtures/e2e-fixture';
+import { test } from '@fixtures/e2e-fixture';
 
 test.describe('PSR end-to-end journey', () => {
   test.describe.configure({ retries: 0 });
