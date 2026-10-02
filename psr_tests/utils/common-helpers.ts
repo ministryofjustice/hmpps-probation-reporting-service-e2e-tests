@@ -76,7 +76,16 @@ export async function verifyValidationError(
   await expect(page.locator(`#${fieldId}-error`)).toContainText(message);
 
   if (value !== undefined) {
-    await expect(page.locator(`#${fieldId}`)).toHaveValue(value);
+    const field = page.locator(`#${fieldId}`);
+    const isContentEditable = await field.evaluate((element) => {
+      return element instanceof HTMLElement && element.isContentEditable;
+    });
+
+    if (isContentEditable) {
+      await expect(field).toHaveText(value);
+    } else {
+      await expect(field).toHaveValue(value);
+    }
   }
 }
 
