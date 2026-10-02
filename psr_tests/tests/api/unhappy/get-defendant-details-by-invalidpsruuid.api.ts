@@ -3,8 +3,10 @@ import { expect, test } from '@fixtures/api-auth-fixture';
 import { apiTestData } from '@test-data/api.test-data';
 
 test.describe(`PSR – API Contract and Behaviour Tests`, () => {
-  test(`GET /report/{psrUuid}/defendant-details - A invalid psruuid returns a response with a
-  status code of 404 - @smoke @api @regression`, async ({ apiClient, authToken }) => {
+  test(`GET /report/{psrUuid}/defendant-details - An invalid PSR UUID returns a 404 response - @smoke @api @regression`, async ({
+    apiClient,
+    authToken,
+  }) => {
     const response = await apiClient.get(
       `/report/${apiTestData.invalidPSRUUID}/defendant-details`,
       {

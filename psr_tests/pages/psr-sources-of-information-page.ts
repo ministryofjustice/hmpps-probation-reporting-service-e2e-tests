@@ -26,12 +26,12 @@ export class PsrSourcesOfInformationPage {
   async completePsrSourcesOfInformationPage(source = 'Domestic abuse callout information') {
     await commonFunctions.clickOnLinkByName(this.page, 'Sources of information');
     await this.verifyPageControls();
-    await this.selectPredefinedSource(source);
+    await commonFunctions.selectCheckBoxByName(this.page, source, true);
     await this.continueToReviewYourProgressPage();
   }
 
   async addSource(source: string) {
-    await this.page.locator('#source').fill(source);
+    await this.enterSource(source);
     await commonFunctions.clickOnButtonByName(this.page, 'Add to list');
     await expect(this.sourceLabel(source)).toBeVisible();
     await expect(this.page.locator('#source')).toHaveValue('');
@@ -61,14 +61,12 @@ export class PsrSourcesOfInformationPage {
   async resetToBaseline(selectedSource: string) {
     await this.clearManuallyAddedSources();
     await this.clearPredefinedSourceSelections();
-    await this.selectPredefinedSource(selectedSource);
-    await this.saveAndContinue();
+    await commonFunctions.selectCheckBoxByName(this.page, selectedSource, true);
+    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
     await this.openPsrSourcesOfInformationPage();
     await expect(this.page.locator('#added-sources .added-source')).toHaveCount(0);
     await expect(this.page.locator('input[type="checkbox"]:checked')).toHaveCount(1);
-    await expect(
-      this.page.getByRole('checkbox', { name: selectedSource, exact: true }),
-    ).toBeChecked();
+    await this.verifyPredefinedSourceSelection(selectedSource, true);
   }
 
   async verifyPageControls() {
@@ -80,27 +78,16 @@ export class PsrSourcesOfInformationPage {
   }
 
   async verifyPredefinedSourcesCanBeSelectedIndependently(sources: string[]) {
-    const checkboxes = sources.map((source) =>
-      this.page.getByRole('checkbox', { name: source, exact: true }),
-    );
-
-    for (const checkbox of checkboxes) {
-      await expect(checkbox).toBeVisible();
-      await expect(checkbox).toBeEnabled();
-      await checkbox.check();
+    for (const source of sources) {
+      await commonFunctions.selectCheckBoxByName(this.page, source, true);
     }
 
-    for (const checkbox of checkboxes) {
+    for (const source of sources) {
+      const checkbox = this.page.getByRole('checkbox', { name: source, exact: true });
       await expect(checkbox).toBeChecked();
       await checkbox.uncheck();
       await expect(checkbox).not.toBeChecked();
     }
-  }
-
-  async selectPredefinedSource(source: string) {
-    const checkbox = this.page.getByRole('checkbox', { name: source, exact: true });
-    await checkbox.check();
-    await expect(checkbox).toBeChecked();
   }
 
   async clearPredefinedSourceSelections() {
@@ -109,10 +96,6 @@ export class PsrSourcesOfInformationPage {
     while (await selectedCheckboxes.count()) {
       await selectedCheckboxes.first().uncheck();
     }
-  }
-
-  async isPredefinedSourceSelected(source: string) {
-    return this.page.getByRole('checkbox', { name: source, exact: true }).isChecked();
   }
 
   async verifyPredefinedSourceSelection(source: string, expectedSelection: boolean) {
@@ -135,41 +118,12 @@ export class PsrSourcesOfInformationPage {
     await expect(this.sourceRow(source).locator('button[name="removeSource"]')).toBeVisible();
   }
 
-  async saveAndContinue() {
-    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
-  }
-
   async continueToReviewYourProgressPage() {
-    await this.saveAndContinue();
+    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Review your progress');
   }
 
   async enterSource(source: string) {
     await this.page.locator('#source').fill(source);
-  }
-
-  async addEnteredSource() {
-    await commonFunctions.clickOnButtonByName(this.page, 'Add to list');
-  }
-
-  async verifyCharacterLimitWarning(message: string, value: string) {
-    await expect(this.page.locator('#source-info')).toContainText(message);
-    await expect(this.page.locator('.govuk-error-summary')).not.toBeVisible();
-    await expect(this.page.locator('#source')).toHaveValue(value);
-  }
-
-  async verifyValidationError(
-    message: string,
-    value?: string,
-    inlineErrorSelector = '#source-error',
-  ) {
-    const errorSummary = this.page.locator('.govuk-error-summary');
-    await expect(errorSummary).toBeVisible();
-    await expect(errorSummary).toContainText(message);
-    await expect(this.page.locator(inlineErrorSelector)).toContainText(message);
-
-    if (value !== undefined) {
-      await expect(this.page.locator('#source')).toHaveValue(value);
-    }
   }
 }

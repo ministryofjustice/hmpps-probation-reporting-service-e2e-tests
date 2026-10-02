@@ -64,6 +64,36 @@ export async function verifyPageHeadingsByName(page: Page, pageHeadingName: stri
   });
 }
 
+export async function verifyValidationError(
+  page: Page,
+  fieldId: string,
+  message: string,
+  value?: string,
+) {
+  const errorSummary = page.locator('.govuk-error-summary');
+  await expect(errorSummary).toBeVisible();
+  await expect(errorSummary).toContainText(message);
+  await expect(page.locator(`#${fieldId}-error`)).toContainText(message);
+
+  if (value !== undefined) {
+    const field = page.locator(`#${fieldId}`);
+    const isContentEditable = await field.evaluate((element) => {
+      return element instanceof HTMLElement && element.isContentEditable;
+    });
+
+    if (isContentEditable) {
+      await expect(field).toHaveText(value);
+    } else {
+      await expect(field).toHaveValue(value);
+    }
+  }
+}
+
+export async function verifyCharacterCountMessage(page: Page, fieldId: string, message: string) {
+  await expect(page.locator(`#${fieldId}-info`)).toHaveText(message);
+  await expect(page.locator('.govuk-error-summary')).not.toBeVisible();
+}
+
 function getOptionalTestInfo() {
   try {
     return test.info();
@@ -193,7 +223,7 @@ export async function fillTextInTextArea(
   if (isContentEditable) {
     await textArea.press('ControlOrMeta+A');
     await textArea.press('Backspace');
-    await expect(textArea).toHaveText('');
+    await expect(textArea).toBeEmpty();
   } else {
     await textArea.clear();
     await expect(textArea).toHaveValue('');
@@ -288,10 +318,10 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
   await verifyTextIsPersisted(page, pageName, editorName, enteredText);
 }
 
-export async function selectCheckBoxByName(page: Page, checkBoxName: string) {
-  await page.getByRole('checkbox', { name: `${checkBoxName}` }).check();
-  const isChecked = await page.getByRole('checkbox', { name: `${checkBoxName}` }).isChecked();
-  expect(isChecked).toBeTruthy();
+export async function selectCheckBoxByName(page: Page, checkBoxName: string, exact = false) {
+  const checkbox = page.getByRole('checkbox', { name: checkBoxName, exact });
+  await checkbox.check();
+  await expect(checkbox).toBeChecked();
 }
 
 export async function selectRadioButtonByName(page: Page, radioName: string) {
@@ -339,6 +369,8 @@ export const commonFunctions = {
   waitForAutoSaveConfirmation,
   verifyTextIsPersisted,
   verifyTextAreaAutoSavesAfterInactivity,
+  verifyValidationError,
+  verifyCharacterCountMessage,
   selectCheckBoxByName,
   selectRadioButtonByName,
   selectDropdownOption,
