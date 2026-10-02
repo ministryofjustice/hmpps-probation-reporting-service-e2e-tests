@@ -171,10 +171,10 @@ export async function fillTextInTextArea(
             textArea = (await inNearestContainer.count())
               ? inNearestContainer.first()
               : fieldLabel
-                  .locator(
-                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                  )
-                  .first();
+                .locator(
+                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                )
+                .first();
           }
         }
       }
@@ -214,7 +214,7 @@ export async function fillTextInTextArea(
   if (isContentEditable) {
     await textArea.press('ControlOrMeta+A');
     await textArea.press('Backspace');
-    await expect(textArea).toHaveText('');
+    await expect(textArea).toBeEmpty();
   } else {
     await textArea.clear();
     await expect(textArea).toHaveValue('');
@@ -268,8 +268,8 @@ export async function verifyTextIsPersisted(
         editor = (await inNearestContainer.count())
           ? inNearestContainer.first()
           : fieldLabel
-              .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
-              .first();
+            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+            .first();
       }
     }
   }
