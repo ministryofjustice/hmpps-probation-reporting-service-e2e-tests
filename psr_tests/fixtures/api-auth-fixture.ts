@@ -16,6 +16,7 @@ export const test = base.extend<apiFixtures>({
     });
 
     await use(api);
+    await api.dispose();
   },
 
   authToken: async ({ apiClient }, use) => {

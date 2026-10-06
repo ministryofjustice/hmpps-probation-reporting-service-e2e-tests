@@ -13,7 +13,7 @@ Playwright docs: https://playwright.dev/docs/intro
 ## Project Structure
 
 ```text
-e2e_tests/
+psr_tests/
     fixtures/     shared test fixtures (auth, page objects, setup)
     pages/        page object models
     test-data/    reusable test data
@@ -57,7 +57,7 @@ Run these commands to verify setup:
 
 - Run one UI test:
 
-  npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-defendant-details-page-happy.ui.ts
+  npm run test:ui:file -- psr_tests/tests/ui/happy/psr-defendant-details-page-happy.ui.ts
 
 ## Test Types
 
@@ -71,8 +71,8 @@ Current coverage includes API checks, direct-route UI page tests, an offence-ana
 
 ## Test Architecture
 
-- [e2e_tests/fixtures/ui-auth-fixture.ts](e2e_tests/fixtures/ui-auth-fixture.ts) handles login and cleanup only.
-- [e2e_tests/fixtures/page-fixtures.ts](e2e_tests/fixtures/page-fixtures.ts) supplies page objects for each PSR page.
+- [psr_tests/fixtures/ui-auth-fixture.ts](psr_tests/fixtures/ui-auth-fixture.ts) handles login and cleanup only.
+- [psr_tests/fixtures/page-fixtures.ts](psr_tests/fixtures/page-fixtures.ts) supplies page objects for each PSR page.
 - Page-level UI suites open their authenticated page route directly. This keeps page behavior tests independent and fast.
 - UI happy-path and unhappy-path scenarios are kept in separate `tests/ui/happy` and `tests/ui/unhappy` suites.
 - The offence-analysis autosave suite is intentionally journey-based because it verifies save triggers across navigation, Save and continue, inactivity, and sign-out.
@@ -104,16 +104,16 @@ npx playwright test --project=e2e-tests
 
 ```bash
 npx playwright test --project=ui-tests --list
-npx playwright test e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts --project=ui-tests --headed
-npx playwright test e2e_tests/tests/ui/unhappy/psr-sources-of-information-page-unhappy.ui.ts --project=ui-tests
-npx playwright test e2e_tests/tests/e2e/happy/psr-happy-flow.e2e.ts --project=e2e-tests
+npx playwright test psr_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts --project=ui-tests --headed
+npx playwright test psr_tests/tests/ui/unhappy/psr-sources-of-information-page-unhappy.ui.ts --project=ui-tests
+npx playwright test psr_tests/tests/e2e/happy/psr-happy-flow.e2e.ts --project=e2e-tests
 ```
 
 Run all UI happy or unhappy-path tests:
 
 ```bash
-npx playwright test e2e_tests/tests/ui/happy --project=ui-tests
-npx playwright test e2e_tests/tests/ui/unhappy --project=ui-tests
+npx playwright test psr_tests/tests/ui/happy --project=ui-tests
+npx playwright test psr_tests/tests/ui/unhappy --project=ui-tests
 ```
 
 ### Run by tag
@@ -140,14 +140,14 @@ npm run test:e2e
 ### Run one specific file
 
 ```bash
-npm run test:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
-npm run test:ui:file -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
-npm run test:ui:file:headed -- e2e_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
+npm run test:file -- psr_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
+npm run test:ui:file -- psr_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
+npm run test:ui:file:headed -- psr_tests/tests/ui/happy/psr-offence-analysis-page-happy.ui.ts
 ```
 
 ## UI Textarea Helper
 
-Shared helper: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
+Shared helper: [psr_tests/utils/common-helpers.ts](psr_tests/utils/common-helpers.ts)
 
 ```ts
 fillTextInTextArea(page, textOrLength, textAreaKey?, randomMode?)
@@ -188,14 +188,14 @@ await commonFunctions.fillTextInTextArea(
 
 ## Random Text Generators
 
-Source: [e2e_tests/utils/random-paragraph-generator.ts](e2e_tests/utils/random-paragraph-generator.ts)
+Source: [psr_tests/utils/random-paragraph-generator.ts](psr_tests/utils/random-paragraph-generator.ts)
 
 - `generateReadableRandomParagraph(length)` for happy-path readable text
 - `generateRandomParagraph(length, { mode: 'complex' })` for stress/edge data
 
 ## Other Common Helpers
 
-Source: [e2e_tests/utils/common-helpers.ts](e2e_tests/utils/common-helpers.ts)
+Source: [psr_tests/utils/common-helpers.ts](psr_tests/utils/common-helpers.ts)
 
 - `verifyNoAccessibilityViolations(makeAxeBuilder)`
 - `verifyPageHeadingsByName(page, headingText)`
@@ -266,7 +266,7 @@ Accessibility checks in this project use Axe tags for these WCAG levels:
 
 ## AxeBuilder Configuration
 
-Source: [e2e_tests/fixtures/ui-auth-fixture.ts](e2e_tests/fixtures/ui-auth-fixture.ts)
+Source: [psr_tests/fixtures/ui-auth-fixture.ts](psr_tests/fixtures/ui-auth-fixture.ts)
 
 The shared accessibility fixture creates `makeAxeBuilder()` and applies the default tags:
 
@@ -286,6 +286,13 @@ This means every test can call the same builder and run consistent accessibility
 ```ts
 await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
 ```
+
+### Where scans run
+
+- Each page has one `@accessibility` scan in its happy-path suite.
+- Pages with validation also scan each distinct error layout in their unhappy-path suite (for example, a checkbox-group error, a text-input error, or a character-count error), because error summaries, inline errors, and `aria-describedby` links only render when validation fails.
+- Unhappy tests that only change the error text reuse an existing layout and are not scanned again.
+- Call the scan after asserting the state, so Axe runs against the fully rendered page.
 
 ### Run accessibility-only tests
 
