@@ -180,10 +180,10 @@ export async function fillTextInTextArea(
             textArea = (await inNearestContainer.count())
               ? inNearestContainer.first()
               : fieldLabel
-                  .locator(
-                    'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                  )
-                  .first();
+                .locator(
+                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
+                )
+                .first();
           }
         }
       }
@@ -234,20 +234,58 @@ export async function fillTextInTextArea(
   return textToFill;
 }
 
+function parsePostData(postData: string | null | undefined): Record<string, string> {
+  if (!postData) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(postData);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return Object.fromEntries(
+        Object.entries(parsed).map(([key, value]) => [key, String(value ?? '')]),
+      );
+    }
+  } catch {
+    // Fall through to form-data parsing below.
+  }
+
+  const params = new URLSearchParams(postData);
+  return Object.fromEntries([...params.entries()]);
+}
+
+function isAutosaveRequest(
+  request: { url(): string; method(): string },
+  payload: Record<string, string>,
+) {
+  const url = request.url();
+  const method = request.method();
+
+  if (!['POST', 'PUT', 'PATCH'].includes(method)) {
+    return false;
+  }
+
+  const isAutosaveUrl = /\/psr\/[^/]+\/autosave(?:[/?#]|$)/.test(url);
+  const hasAutosavePage = payload.pageName !== undefined;
+
+  return isAutosaveUrl && hasAutosavePage;
+}
+
+function payloadContainsText(payload: Record<string, string>, expectedText: string) {
+  return Object.values(payload).some((value) => value.includes(expectedText));
+}
+
 export function waitForAutoSaveConfirmation(page: Page, textToSave?: string) {
   return page.waitForResponse(
     (response) => {
       const request = response.request();
-      if (
-        !['POST', 'PUT', 'PATCH'].includes(request.method()) ||
-        !response.ok() ||
-        !request.postData()
-      ) {
+      const payload = parsePostData(request.postData());
+
+      if (!response.ok() || !isAutosaveRequest(request, payload)) {
         return false;
       }
-      return (
-        textToSave === undefined || JSON.stringify(request.postDataJSON()).includes(textToSave)
-      );
+
+      return textToSave === undefined || payloadContainsText(payload, textToSave);
     },
     { timeout: 25_000 },
   );
@@ -289,8 +327,8 @@ export async function verifyTextIsPersisted(
         editor = (await inNearestContainer.count())
           ? inNearestContainer.first()
           : fieldLabel
-              .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
-              .first();
+            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
+            .first();
       }
     }
   }
