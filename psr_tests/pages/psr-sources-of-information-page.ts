@@ -62,7 +62,7 @@ export class PsrSourcesOfInformationPage {
     await this.clearManuallyAddedSources();
     await this.clearPredefinedSourceSelections();
     await commonFunctions.selectCheckBoxByName(this.page, selectedSource, true);
-    await commonFunctions.clickOnButtonByName(this.page, 'Save and continue');
+    await this.continueToReviewYourProgressPage();
     await this.openPsrSourcesOfInformationPage();
     await expect(this.page.locator('#added-sources .added-source')).toHaveCount(0);
     await expect(this.page.locator('input[type="checkbox"]:checked')).toHaveCount(1);
