@@ -234,11 +234,23 @@ export async function fillTextInTextArea(
   return textToFill;
 }
 
-export function waitForAutoSaveConfirmation(page: Page) {
-  return page.waitForEvent('console', {
-    predicate: (message) => message.text().includes('Report saved successfully'),
-    timeout: 20_000,
-  });
+export function waitForAutoSaveConfirmation(page: Page, textToSave?: string) {
+  return page.waitForResponse(
+    (response) => {
+      const request = response.request();
+      if (
+        !['POST', 'PUT', 'PATCH'].includes(request.method()) ||
+        !response.ok() ||
+        !request.postData()
+      ) {
+        return false;
+      }
+      return (
+        textToSave === undefined || JSON.stringify(request.postDataJSON()).includes(textToSave)
+      );
+    },
+    { timeout: 25_000 },
+  );
 }
 
 export async function verifyTextIsPersisted(
@@ -308,7 +320,7 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
 ) {
   await verifyPageHeadingsByName(page, pageName);
 
-  const autoSaveConfirmation = waitForAutoSaveConfirmation(page);
+  const autoSaveConfirmation = waitForAutoSaveConfirmation(page, textToFill);
   const enteredText = await fillTextInTextArea(page, textToFill, editorName);
   const fillCompletedAt = Date.now();
   await autoSaveConfirmation;
