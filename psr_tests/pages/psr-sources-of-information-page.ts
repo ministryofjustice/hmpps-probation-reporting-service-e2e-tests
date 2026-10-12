@@ -7,7 +7,7 @@ export class PsrSourcesOfInformationPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   private sourceLabel(source: string) {
     return this.sourceRow(source).locator('span').first();
