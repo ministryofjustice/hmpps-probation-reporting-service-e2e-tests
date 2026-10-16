@@ -1,4 +1,4 @@
-import { Page, expect, test } from '@playwright/test';
+import { Locator, Page, expect, test } from '@playwright/test';
 import {
   RandomParagraphMode,
   generateRandomParagraph,
@@ -66,30 +66,48 @@ export async function verifyPageHeadingsByName(page: Page, pageHeadingName: stri
 
 export async function verifyValidationError(
   page: Page,
-  fieldId: string,
+  field: string | Locator,
   message: string,
   value?: string,
 ) {
+  const fieldId = typeof field === 'string' ? field : await field.getAttribute('id');
+  if (!fieldId) {
+    throw new Error('The field must have an id to verify its validation error.');
+  }
+
+  const fieldLocator = typeof field === 'string' ? page.locator(`#${fieldId}`) : field;
   const errorSummary = page.locator('.govuk-error-summary');
   await expect(errorSummary).toBeVisible();
   await expect(errorSummary).toContainText(message);
   await expect(page.locator(`#${fieldId}-error`)).toContainText(message);
 
   if (value !== undefined) {
-    const field = page.locator(`#${fieldId}`);
-    const isContentEditable = await field.evaluate((element) => {
+    const isContentEditable = await fieldLocator.evaluate((element) => {
       return element instanceof HTMLElement && element.isContentEditable;
     });
 
     if (isContentEditable) {
-      await expect(field).toHaveText(value);
+      await expect(fieldLocator).toHaveText(value);
     } else {
-      await expect(field).toHaveValue(value);
+      await expect(fieldLocator).toHaveValue(value);
     }
   }
 }
 
-export async function verifyCharacterCountMessage(page: Page, fieldId: string, message: string) {
+export async function verifyCharacterCountMessage(
+  page: Page,
+  field: string | Locator,
+  message: string,
+) {
+  const fieldId = typeof field === 'string' ? field : await field.getAttribute('id');
+  if (!fieldId) {
+    throw new Error('The field must have an id to verify its character count.');
+  }
+
+  if (typeof field !== 'string') {
+    await field.focus();
+  }
+
   await expect(page.locator(`#${fieldId}-info`)).toHaveText(message);
   await expect(page.locator('.govuk-error-summary')).not.toBeVisible();
 }
@@ -368,10 +386,15 @@ export async function verifyTextAreaAutoSavesAfterInactivity(
   await verifyTextIsPersisted(page, pageName, editorName, enteredText);
 }
 
-export async function selectCheckBoxByName(page: Page, checkBoxName: string, exact = false) {
+export async function selectCheckBoxByName(
+  page: Page,
+  checkBoxName: string,
+  exact = false,
+  checked = true,
+) {
   const checkbox = page.getByRole('checkbox', { name: checkBoxName, exact });
-  await checkbox.check();
-  await expect(checkbox).toBeChecked();
+  await checkbox.setChecked(checked);
+  await expect(checkbox).toBeChecked({ checked });
 }
 
 export async function selectRadioButtonByName(page: Page, radioName: string) {

@@ -6,7 +6,7 @@ export class PsrOffenceAnalysisPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) {}
+  ) { }
 
   async openPsrOffenceAnalysisPage() {
     await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/offence-analysis`);
@@ -18,15 +18,10 @@ export class PsrOffenceAnalysisPage {
     await commonFunctions.fillTextInTextArea(
       this.page,
       20000,
-      'Analyse offences under consideration',
+      'offencesUnderConsideration',
       'readable',
     );
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      20000,
-      'Analyse previous offending behaviour and response to supervision',
-      'readable',
-    );
+    await commonFunctions.fillTextInTextArea(this.page, 20000, 'offencesPattern', 'readable');
     await commonFunctions.selectCheckBoxByName(
       this.page,
       'The defendant has no previous offences or experience of supervision',
