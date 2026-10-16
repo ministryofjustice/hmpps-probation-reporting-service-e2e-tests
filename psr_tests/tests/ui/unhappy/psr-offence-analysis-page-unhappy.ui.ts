@@ -45,8 +45,9 @@ test.describe('Offence analysis page - unhappy paths', () => {
         await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
     });
 
-    test('warns when either analysis exceeds 20,000 characters - @ui @regression @offence-analysis', async ({
+    test('warns when either analysis exceeds 20,000 characters - @ui @regression @accessibility @offence-analysis', async ({
         page,
+        makeAxeBuilder,
     }) => {
         const textAreas = page.locator('textarea:visible');
 
@@ -71,6 +72,7 @@ test.describe('Offence analysis page - unhappy paths', () => {
             textAreas.nth(1),
             'You have 1 characters too many',
         );
+        await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
     });
 
     test('rejects analyses over 20,000 characters on Save and continue - @ui @regression @offence-analysis', async ({
