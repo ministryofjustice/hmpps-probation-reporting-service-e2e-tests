@@ -23,7 +23,7 @@ export class PsrSourcesOfInformationPage {
     await this.verifyPageControls();
   }
 
-  async completePsrSourcesOfInformationPage(source = 'Domestic abuse callout information') {
+  async completePsrSourcesOfInformationPage(source = 'Domestic abuse enquiries') {
     await commonFunctions.clickOnLinkByName(this.page, 'Sources of information');
     await this.verifyPageControls();
     await commonFunctions.selectCheckBoxByName(this.page, source, true);
@@ -108,7 +108,8 @@ export class PsrSourcesOfInformationPage {
     const addedSources = await this.page
       .locator('#added-sources .added-source > span:first-child')
       .allTextContents();
-    const sourceIndexes = sources.map((source) => addedSources.indexOf(source));
+    const expectedSources = [...sources].sort((first, second) => first.localeCompare(second));
+    const sourceIndexes = expectedSources.map((source) => addedSources.indexOf(source));
 
     expect(sourceIndexes.every((index) => index >= 0)).toBeTruthy();
     expect(sourceIndexes).toEqual([...sourceIndexes].sort((first, second) => first - second));

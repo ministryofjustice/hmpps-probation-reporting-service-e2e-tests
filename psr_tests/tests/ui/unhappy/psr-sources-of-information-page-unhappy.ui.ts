@@ -7,7 +7,7 @@ const overLimitSource = generateRandomParagraph(81, {
   includeSpaces: false,
   includeSpecialCharacters: false,
 });
-const selectedPredefinedSource = 'Domestic abuse callout information';
+const selectedPredefinedSource = 'Domestic abuse enquiries';
 
 test.describe('Sources of information page - unhappy paths', () => {
   test.describe.configure({ retries: 0 });
