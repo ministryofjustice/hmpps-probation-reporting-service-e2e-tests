@@ -7,7 +7,7 @@ const maximumLengthSource = generateRandomParagraph(80, {
   includeSpaces: false,
   includeSpecialCharacters: false,
 });
-const selectedPredefinedSource = 'Domestic abuse callout information';
+const selectedPredefinedSource = 'Domestic abuse enquiries';
 
 test.describe('Sources of information page - happy paths', () => {
   test.describe.configure({ retries: 0 });
