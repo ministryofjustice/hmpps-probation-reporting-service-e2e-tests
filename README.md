@@ -1,4 +1,4 @@
-# hmpps-probation-in-court-e2e-tests
+# hmpps-probation-reporting-service-e2e-tests
 
 This repository contains Playwright (TypeScript) automation for:
 

@@ -1,5 +1,5 @@
 {
-  "name": "hmpps-probation-in-court-e2e-tests",
+  "name": "hmpps-probation-reporting-service-e2e-tests",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -37,16 +37,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ministryofjustice/hmpps-probation-in-court-e2e-tests.git"
+    "url": "git+https://github.com/ministryofjustice/hmpps-probation-reporting-service-e2e-tests.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/ministryofjustice/hmpps-probation-in-court-e2e-tests/issues"
+    "url": "https://github.com/ministryofjustice/hmpps-probation-reporting-service-e2e-tests/issues"
   },
-  "homepage": "https://github.com/ministryofjustice/hmpps-probation-in-court-e2e-tests#readme",
+  "homepage": "https://github.com/ministryofjustice/hmpps-probation-reporting-service-e2e-tests#readme",
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^9.39.2",
