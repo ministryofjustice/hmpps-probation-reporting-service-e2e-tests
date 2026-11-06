@@ -11,7 +11,7 @@ export class PsrRiskAnalysisPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) { }
+  ) {}
 
   getRiskPredictorsTextarea() {
     return commonFunctions.getTextAreaLocator(this.page, riskPredictorsField);
