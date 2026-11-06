@@ -144,12 +144,7 @@ export async function verifyNoAccessibilityViolations(makeAxeBuilder: () => AxeB
   expect(results.violations.length, `Accessibility violations detected:\n\n${summary}`).toBe(0);
 }
 
-export async function fillTextInTextArea(
-  page: Page,
-  textOrLength: string | number = 'AUTO-TESTING',
-  textAreaKey?: string,
-  randomMode: RandomParagraphMode = 'readable',
-) {
+export async function getTextAreaLocator(page: Page, textAreaKey?: string): Promise<Locator> {
   let textArea = page.locator('textarea:visible, [contenteditable]:visible');
 
   if (textAreaKey) {
@@ -219,7 +214,16 @@ export async function fillTextInTextArea(
     );
   }
 
-  textArea = textArea.first();
+  return textArea.first();
+}
+
+export async function fillTextInTextArea(
+  page: Page,
+  textOrLength: string | number = 'AUTO-TESTING',
+  textAreaKey?: string,
+  randomMode: RandomParagraphMode = 'readable',
+) {
+  const textArea = await getTextAreaLocator(page, textAreaKey);
 
   const textToFill =
     typeof textOrLength === 'number'
@@ -438,6 +442,7 @@ export const commonFunctions = {
   verifyNoAccessibilityViolations,
   generateRandomParagraph,
   generateReadableRandomParagraph,
+  getTextAreaLocator,
   fillTextInTextArea,
   waitForAutoSaveConfirmation,
   verifyTextIsPersisted,
