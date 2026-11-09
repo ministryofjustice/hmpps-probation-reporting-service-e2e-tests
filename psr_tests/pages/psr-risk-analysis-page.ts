@@ -2,15 +2,26 @@ import { Page } from '@playwright/test';
 import { commonFunctions } from '@utils/common-helpers';
 import { uiTestData } from '@test-data/ui.test-data';
 
+export const riskPredictorsField = 'Assess the likelihood of reoffending';
+export const risksOfHarmField = 'Analyse relevant risks of harm and protective factors';
+
 export class PsrRiskAnalysisPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) {}
+  ) { }
 
   async openPsrRiskAnalysisPage() {
     await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/risk-analysis`);
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Risk analysis');
+  }
+
+  getRiskPredictorsTextarea() {
+    return this.page.locator('#risk-predictors');
+  }
+
+  getRisksOfHarmTextarea() {
+    return this.page.locator('#risk-riskAndHarmFactors');
   }
 
   async completePsrRiskAnalysisPage() {
@@ -19,18 +30,9 @@ export class PsrRiskAnalysisPage {
     await commonFunctions.selectDropdownOption(this.page, 'Risk to public', 'Medium risk');
     await commonFunctions.selectDropdownOption(this.page, 'Risk to known adults', 'High risk');
     await commonFunctions.selectDropdownOption(this.page, 'Risk to staff', 'Very high risk');
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      20000,
-      'Steps 2 and 3: Confirm risk predictors and assess the likelihood of reoffending',
-      'readable',
-    );
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      20000,
-      'Step 4: Analyse relevant risks of harm and protective factors',
-      'readable',
-    );
+    await commonFunctions.selectDropdownOption(this.page, 'Risk to prisoners', 'Medium risk');
+    await commonFunctions.fillTextInTextArea(this.page, 20000, riskPredictorsField, 'readable');
+    await commonFunctions.fillTextInTextArea(this.page, 20000, risksOfHarmField, 'readable');
   }
 
   async continueToSentencingProposalPage() {
