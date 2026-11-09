@@ -5,13 +5,12 @@ import { uiTestData } from '@test-data/ui.test-data';
 
 export const riskPredictorsField = 'Assess the likelihood of reoffending';
 export const risksOfHarmField = 'Analyse relevant risks of harm and protective factors';
-const maximumLength = 20000;
 
 export class PsrRiskAnalysisPage {
   constructor(
     public page: Page,
     private psrUUID = uiTestData.psrUUID,
-  ) {}
+  ) { }
 
   getRiskPredictorsTextarea() {
     return commonFunctions.getTextAreaLocator(this.page, riskPredictorsField);
@@ -26,6 +25,14 @@ export class PsrRiskAnalysisPage {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Risk analysis');
   }
 
+  getRiskPredictorsTextarea() {
+    return this.page.locator('#risk-predictors');
+  }
+
+  getRisksOfHarmTextarea() {
+    return this.page.locator('#risk-riskAndHarmFactors');
+  }
+
   async completePsrRiskAnalysisPage() {
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Risk analysis');
     await commonFunctions.selectDropdownOption(this.page, 'Risk to children', 'Low risk');
@@ -33,16 +40,8 @@ export class PsrRiskAnalysisPage {
     await commonFunctions.selectDropdownOption(this.page, 'Risk to known adults', 'High risk');
     await commonFunctions.selectDropdownOption(this.page, 'Risk to staff', 'Very high risk');
     await commonFunctions.selectDropdownOption(this.page, 'Risk to prisoners', 'Medium risk');
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      generateRandomParagraph(maximumLength, { mode: 'readable' }),
-      riskPredictorsField,
-    );
-    await commonFunctions.fillTextInTextArea(
-      this.page,
-      generateRandomParagraph(maximumLength, { mode: 'readable' }),
-      risksOfHarmField,
-    );
+    await commonFunctions.fillTextInTextArea(this.page, 20000, riskPredictorsField, 'readable');
+    await commonFunctions.fillTextInTextArea(this.page, 20000, risksOfHarmField, 'readable');
   }
 
   async continueToSentencingProposalPage() {
