@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 import { commonFunctions } from '@utils/common-helpers';
-import { generateRandomParagraph } from '@utils/random-paragraph-generator';
 import { uiTestData } from '@test-data/ui.test-data';
 
 export const riskPredictorsField = 'Assess the likelihood of reoffending';
@@ -23,14 +22,6 @@ export class PsrRiskAnalysisPage {
   async openPsrRiskAnalysisPage() {
     await this.page.goto(`${uiTestData.uiBaseUrl}/psr/${this.psrUUID}/risk-analysis`);
     await commonFunctions.verifyPageHeadingsByName(this.page, 'Risk analysis');
-  }
-
-  getRiskPredictorsTextarea() {
-    return this.page.locator('#risk-predictors');
-  }
-
-  getRisksOfHarmTextarea() {
-    return this.page.locator('#risk-riskAndHarmFactors');
   }
 
   async completePsrRiskAnalysisPage() {
