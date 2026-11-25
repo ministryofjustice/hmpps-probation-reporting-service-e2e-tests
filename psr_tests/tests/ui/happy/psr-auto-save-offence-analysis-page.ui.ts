@@ -3,7 +3,7 @@ import { expect, signIn, signOut, test } from '@fixtures/ui-auth-fixture';
 import { commonFunctions } from '@utils/common-helpers';
 
 const pageName = 'Offence analysis';
-const editorName = 'Analyse previous offending behaviour and response to supervision';
+const editorName = 'offencesPattern';
 const sideNavigationText = 'Autosave when navigating side navigation';
 const saveAndContinueText = 'Autosave when selecting Save and continue';
 const inactivityText = 'Autosave after 15 seconds of inactivity';

@@ -3,8 +3,7 @@ import { riskPredictorsField, risksOfHarmField } from '@pages/psr-risk-analysis-
 import { commonFunctions } from '@utils/common-helpers';
 import { test } from '@fixtures/ui-auth-fixture';
 
-const riskPredictorsError =
-    'Risk predictors and likelihood of reoffending must be 20,000 characters or less';
+const riskPredictorsError = 'Likelihood of reoffending must be 20,000 characters or less';
 const risksOfHarmError = 'Risks of harm and protective factors must be 20,000 characters or less';
 const requiredRiskLevelErrors = [
     ['Risk to children', 'Select the level of risk to children from OASys'],

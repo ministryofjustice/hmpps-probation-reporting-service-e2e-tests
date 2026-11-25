@@ -24,7 +24,11 @@ test.describe(`Offence analysis page - happy paths`, () => {
     psrOffenceAnalysisPage,
   }) => {
     await psrOffenceAnalysisPage.openPsrOffenceAnalysisPage();
-    const textAreas = page.locator('textarea:visible');
+    const offencesTextarea = await commonFunctions.getTextAreaLocator(page, offencesField);
+    const previousOffendingTextarea = await commonFunctions.getTextAreaLocator(
+      page,
+      previousOffendingField,
+    );
     await commonFunctions.fillTextInTextArea(
       page,
       generateRandomParagraph(maximumLength - 12, exactLengthOptions),
@@ -32,7 +36,7 @@ test.describe(`Offence analysis page - happy paths`, () => {
     );
     await commonFunctions.verifyCharacterCountMessage(
       page,
-      textAreas.nth(0),
+      offencesTextarea,
       'You have 12 characters remaining',
     );
 
@@ -43,7 +47,7 @@ test.describe(`Offence analysis page - happy paths`, () => {
     );
     await commonFunctions.verifyCharacterCountMessage(
       page,
-      textAreas.nth(1),
+      previousOffendingTextarea,
       'You have 12 characters remaining',
     );
   });

@@ -151,56 +151,24 @@ export async function getTextAreaLocator(page: Page, textAreaKey?: string): Prom
     const byNameOrId = page.locator(
       `textarea[name="${textAreaKey}"]:visible, textarea[id="${textAreaKey}"]:visible, [contenteditable][aria-label="${textAreaKey}"]:visible, [contenteditable][id="${textAreaKey}"]:visible, [contenteditable][name="${textAreaKey}"]:visible`,
     );
+    const byAccessibleName = page.getByRole('textbox', { name: textAreaKey, exact: true });
+    const fieldAnchor = page
+      .locator(`textarea[name="${textAreaKey}"], textarea[id="${textAreaKey}"]`)
+      .or(page.getByText(textAreaKey, { exact: true }));
+    const inNearestContainer = fieldAnchor
+      .locator('xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]')
+      .locator('textarea:visible, [contenteditable]:visible');
 
     if (await byNameOrId.count()) {
       textArea = byNameOrId.first();
+    } else if (await byAccessibleName.count()) {
+      textArea = byAccessibleName.first();
     } else {
-      const byAccessibleName = page
-        .getByRole('textbox', { name: textAreaKey, exact: true })
-        .first();
-
-      if (await byAccessibleName.count()) {
-        textArea = byAccessibleName;
-      } else {
-        const heading = page
-          .getByRole('heading', {
-            name: textAreaKey,
-            exact: true,
-          })
-          .first();
-
-        const fieldLabel = (await heading.count())
-          ? heading
-          : page.getByText(textAreaKey, { exact: true }).first();
-
-        const availableTextAreas = page.locator('textarea:visible, [contenteditable]:visible');
-        if (!(await fieldLabel.count()) && (await availableTextAreas.count()) === 1) {
-          textArea = availableTextAreas.first();
-        } else {
-          await expect(fieldLabel).toBeVisible();
-
-          const inFormGroup = fieldLabel
-            .locator(
-              'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
-            )
-            .first();
-          if (await inFormGroup.count()) {
-            textArea = inFormGroup;
-          } else {
-            const inNearestContainer = fieldLabel.locator(
-              'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
-            );
-            textArea = (await inNearestContainer.count())
-              ? inNearestContainer.first()
-              : fieldLabel
-                .locator(
-                  'xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]',
-                )
-                .first();
-          }
-        }
-      }
+      textArea = inNearestContainer.first();
     }
+
+    await expect(textArea).toBeVisible();
+    return textArea;
   }
 
   const matches = await textArea.count();
@@ -320,42 +288,7 @@ export async function verifyTextIsPersisted(
   text: string,
 ) {
   await verifyPageHeadingsByName(page, pageName);
-  let editor = page.locator(
-    `textarea[name="${editorName}"]:visible, textarea[id="${editorName}"]:visible, [contenteditable][aria-label="${editorName}"]:visible, [contenteditable][id="${editorName}"]:visible, [contenteditable][name="${editorName}"]:visible`,
-  );
-
-  if (!(await editor.count())) {
-    const editorHeading = page.getByRole('heading', { name: editorName, exact: true }).first();
-    const fieldLabel = (await editorHeading.count())
-      ? editorHeading
-      : page.getByText(editorName, { exact: true }).first();
-    const availableEditors = page.locator('textarea:visible, [contenteditable]:visible');
-    if (!(await fieldLabel.count()) && (await availableEditors.count()) === 1) {
-      editor = availableEditors.first();
-    } else {
-      await expect(fieldLabel).toBeVisible();
-      const inFormGroup = fieldLabel
-        .locator(
-          'xpath=ancestor::*[contains(@class,"govuk-form-group")][1]//*[self::textarea or @contenteditable][not(@hidden)]',
-        )
-        .first();
-
-      if (await inFormGroup.count()) {
-        editor = inFormGroup;
-      } else {
-        const inNearestContainer = fieldLabel.locator(
-          'xpath=ancestor::*[.//*[self::textarea or @contenteditable]][1]//*[self::textarea or @contenteditable][1]',
-        );
-        editor = (await inNearestContainer.count())
-          ? inNearestContainer.first()
-          : fieldLabel
-            .locator('xpath=following::*[self::textarea or @contenteditable][not(@hidden)][1]')
-            .first();
-      }
-    }
-  }
-
-  editor = editor.first();
+  const editor = await getTextAreaLocator(page, editorName);
   await expect(editor).toBeVisible();
 
   const isContentEditable = await editor.evaluate((element) => {
