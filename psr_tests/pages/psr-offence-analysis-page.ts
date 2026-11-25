@@ -22,10 +22,6 @@ export class PsrOffenceAnalysisPage {
       'readable',
     );
     await commonFunctions.fillTextInTextArea(this.page, 20000, 'offencesPattern', 'readable');
-    await commonFunctions.selectCheckBoxByName(
-      this.page,
-      'The defendant has no previous offences or experience of supervision',
-    );
   }
 
   async continueToDefendantBehaviourPage() {

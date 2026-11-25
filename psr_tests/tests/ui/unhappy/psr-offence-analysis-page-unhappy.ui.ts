@@ -4,8 +4,6 @@ import { test } from '@fixtures/ui-auth-fixture';
 
 const offencesField = 'offencesUnderConsideration';
 const previousOffendingField = 'offencesPattern';
-const noPreviousOffencesCheckbox =
-    'The defendant has no previous offences or experience of supervision';
 const maximumLength = 20000;
 const exactLengthOptions = { includeSpaces: false, includeSpecialCharacters: false };
 
@@ -16,8 +14,6 @@ test.describe('Offence analysis page - unhappy paths', () => {
         await psrOffenceAnalysisPage.openPsrOffenceAnalysisPage();
         await commonFunctions.fillTextInTextArea(page, '', offencesField);
         await commonFunctions.fillTextInTextArea(page, '', previousOffendingField);
-
-        await commonFunctions.selectCheckBoxByName(page, noPreviousOffencesCheckbox, true, false);
     });
 
     test('shows validation errors when selecting Save and continue with required fields empty - @ui @regression @accessibility @offence-analysis', async ({
@@ -26,21 +22,20 @@ test.describe('Offence analysis page - unhappy paths', () => {
     }) => {
         await commonFunctions.clickOnButtonByName(page, 'Save and continue');
 
-        const textAreas = page.locator('textarea:visible');
+        const offencesTextarea = await commonFunctions.getTextAreaLocator(page, offencesField);
+        const previousOffendingTextarea = await commonFunctions.getTextAreaLocator(
+            page,
+            previousOffendingField,
+        );
         await commonFunctions.verifyValidationError(
             page,
-            textAreas.nth(0),
+            offencesTextarea,
             'Analyse the offences under consideration',
         );
         await commonFunctions.verifyValidationError(
             page,
-            textAreas.nth(1),
-            'Analyse the pattern of offending and response to supervision',
-        );
-        await commonFunctions.verifyValidationError(
-            page,
-            page.getByRole('checkbox', { name: noPreviousOffencesCheckbox, exact: true }),
-            'Check the box if the defendant has no previous offences or experience of supervision',
+            previousOffendingTextarea,
+            'Analyse previous offending behaviour and response to supervision or briefly explain why this does not apply',
         );
         await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
     });
@@ -49,7 +44,11 @@ test.describe('Offence analysis page - unhappy paths', () => {
         page,
         makeAxeBuilder,
     }) => {
-        const textAreas = page.locator('textarea:visible');
+        const offencesTextarea = await commonFunctions.getTextAreaLocator(page, offencesField);
+        const previousOffendingTextarea = await commonFunctions.getTextAreaLocator(
+            page,
+            previousOffendingField,
+        );
 
         await commonFunctions.fillTextInTextArea(
             page,
@@ -58,7 +57,7 @@ test.describe('Offence analysis page - unhappy paths', () => {
         );
         await commonFunctions.verifyCharacterCountMessage(
             page,
-            textAreas.nth(0),
+            offencesTextarea,
             'You have 1 characters too many',
         );
 
@@ -69,7 +68,7 @@ test.describe('Offence analysis page - unhappy paths', () => {
         );
         await commonFunctions.verifyCharacterCountMessage(
             page,
-            textAreas.nth(1),
+            previousOffendingTextarea,
             'You have 1 characters too many',
         );
         await commonFunctions.verifyNoAccessibilityViolations(makeAxeBuilder);
@@ -80,7 +79,11 @@ test.describe('Offence analysis page - unhappy paths', () => {
     }) => {
         const overLimitOffences = `${generateRandomParagraph(maximumLength, exactLengthOptions)}A`;
         const overLimitPreviousOffending = `${generateRandomParagraph(maximumLength, exactLengthOptions)}A`;
-        const textAreas = page.locator('textarea:visible');
+        const offencesTextarea = await commonFunctions.getTextAreaLocator(page, offencesField);
+        const previousOffendingTextarea = await commonFunctions.getTextAreaLocator(
+            page,
+            previousOffendingField,
+        );
 
         await commonFunctions.fillTextInTextArea(page, overLimitOffences, offencesField);
         await commonFunctions.fillTextInTextArea(
@@ -88,18 +91,17 @@ test.describe('Offence analysis page - unhappy paths', () => {
             overLimitPreviousOffending,
             previousOffendingField,
         );
-        await commonFunctions.selectCheckBoxByName(page, noPreviousOffencesCheckbox, true);
         await commonFunctions.clickOnButtonByName(page, 'Save and continue');
 
         await commonFunctions.verifyValidationError(
             page,
-            textAreas.nth(0),
+            offencesTextarea,
             'Offences under consideration must be 20,000 characters or less',
             overLimitOffences,
         );
         await commonFunctions.verifyValidationError(
             page,
-            textAreas.nth(1),
+            previousOffendingTextarea,
             'Pattern of offending must be 20,000 characters or less',
             overLimitPreviousOffending,
         );
